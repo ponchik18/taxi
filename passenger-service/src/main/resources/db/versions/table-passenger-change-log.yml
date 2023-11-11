@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-passenger-table
+      author: ponchik18
+      changes:
+        - createTable:
+            tableName: passenger
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: firstname
+                  type: VARCHAR(255)
+              - column:
+                  name: lastname
+                  type: VARCHAR(255)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: phone
+                  type: VARCHAR(255)
+      rollback:
+        - dropTable:
+            tableName: passenger
