@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PassengerRequest {
     @NotEmpty(message = PassengerServiceConstants.Validation.Message.FIRSTNAME_EMPTY)
-    private String firstname;
+    private String firstName;
     @NotEmpty(message = PassengerServiceConstants.Validation.Message.LASTNAME_EMPTY)
-    private String lastname;
+    private String lastName;
     @NotEmpty(message = PassengerServiceConstants.Validation.Message.EMAIL_EMPTY)
     @Email(message = PassengerServiceConstants.Validation.Message.EMAIL_FORMAT)
     private String email;

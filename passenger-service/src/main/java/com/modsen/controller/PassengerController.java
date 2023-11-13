@@ -1,6 +1,7 @@
 package com.modsen.controller;
 
 import com.modsen.constants.PassengerServiceConstants;
+import com.modsen.dto.PassengerListResponse;
 import com.modsen.dto.PassengerRequest;
 import com.modsen.dto.PassengerResponse;
 import com.modsen.model.PageSetting;
@@ -18,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH)
 @RequiredArgsConstructor
@@ -28,31 +27,31 @@ public class PassengerController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<PassengerResponse> getAllPassenger(PageSetting pageSetting) {
+    public PassengerListResponse getAllPassenger(PageSetting pageSetting) {
         return passengerService.getAllPassenger(pageSetting);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createPassenger(@Valid @RequestBody PassengerRequest passengerRequest) {
-        passengerService.createPassenger(passengerRequest);
+    public PassengerResponse createPassenger(@Valid @RequestBody PassengerRequest passengerRequest) {
+        return passengerService.createPassenger(passengerRequest);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PassengerResponse getPassengerById(@PathVariable Integer id) {
+    public PassengerResponse getPassengerById(@PathVariable long id) {
         return passengerService.getPassengerById(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void updatePassenger(@PathVariable Integer id, @Valid @RequestBody PassengerRequest passengerRequest) {
-        passengerService.updatePassenger(id, passengerRequest);
+    public PassengerResponse updatePassenger(@PathVariable long id, @Valid @RequestBody PassengerRequest passengerRequest) {
+        return passengerService.updatePassenger(id, passengerRequest);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePassenger(@PathVariable Integer id) {
+    public void deletePassenger(@PathVariable long id) {
         passengerService.deletePassenger(id);
     }
 }

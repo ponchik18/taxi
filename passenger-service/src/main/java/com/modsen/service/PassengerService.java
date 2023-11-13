@@ -1,21 +1,20 @@
 package com.modsen.service;
 
+import com.modsen.dto.PassengerListResponse;
 import com.modsen.dto.PassengerRequest;
 import com.modsen.dto.PassengerResponse;
 import com.modsen.model.PageSetting;
 
-import java.util.List;
-
 
 public interface PassengerService {
 
-    List<PassengerResponse> getAllPassenger(PageSetting pageSetting);
+    PassengerListResponse getAllPassenger(PageSetting pageSetting);
 
-    void createPassenger(PassengerRequest passengerRequest);
+    PassengerResponse createPassenger(PassengerRequest passengerRequest);
 
-    PassengerResponse getPassengerById(Integer id);
+    PassengerResponse getPassengerById(long id);
 
-    void updatePassenger(Integer id, PassengerRequest passengerRequest);
+    PassengerResponse updatePassenger(long id, PassengerRequest passengerRequest);
 
-    void deletePassenger(Integer id);
+    void deletePassenger(long id);
 }

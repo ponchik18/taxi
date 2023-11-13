@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PageSetting {
-    private Integer page = PassengerServiceConstants.DefaultValue.PAGE;
-    private Integer elementPerPage = PassengerServiceConstants.DefaultValue.ELEMENT_PER_PAGE;
+    private int pageNumber = PassengerServiceConstants.DefaultValue.PAGE;
+    private int elementsPerPage = PassengerServiceConstants.DefaultValue.ELEMENT_PER_PAGE;
     private String direction = PassengerServiceConstants.DefaultValue.SORT_DESC;
-    private String key;
+    private String sortField;
 }

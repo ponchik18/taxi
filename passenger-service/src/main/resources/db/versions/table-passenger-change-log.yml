@@ -8,22 +8,26 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: INTEGER
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     primaryKey: true
               - column:
-                  name: firstname
+                  name: first_name
                   type: VARCHAR(255)
               - column:
-                  name: lastname
+                  name: last_name
                   type: VARCHAR(255)
               - column:
                   name: email
                   type: VARCHAR(255)
+                  constraints:
+                    unique: true
               - column:
                   name: phone
                   type: VARCHAR(255)
+                  constraints:
+                    unique: true
       rollback:
         - dropTable:
             tableName: passenger

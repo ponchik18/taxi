@@ -17,8 +17,8 @@ public interface PassengerServiceConstants {
     }
 
     interface DefaultValue {
-        Integer PAGE = 0;
-        Integer ELEMENT_PER_PAGE = 10;
+        int PAGE = 0;
+        int ELEMENT_PER_PAGE = 10;
         String SORT_ASC = "asc";
         String SORT_DESC = "dsc";
     }
@@ -26,6 +26,9 @@ public interface PassengerServiceConstants {
     interface Errors {
         interface Message {
             String USER_NOT_FOUND = "User with id %d not found!";
+            String NOT_VALID_FIELD = "Error in filled fields!";
+            String DUPLICATE_USER_WITH_EMAIL = "User with email '%s' has already defined";
+            String DUPLICATE_USER_WITH_PHONE = "User with phone '%s' has already defined";
         }
     }
 

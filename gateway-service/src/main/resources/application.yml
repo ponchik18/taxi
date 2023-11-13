@@ -3,4 +3,4 @@ server:
 
 spring:
   application:
-    name: passenger
+    name: gateway-service

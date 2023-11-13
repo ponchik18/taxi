@@ -10,17 +10,19 @@ import java.util.Objects;
 public class PageRequestFactory {
     public static PageRequest buildPageRequest(PageSetting pageSetting) {
         Sort sort = buildSort(pageSetting);
-        return PageRequest.of(pageSetting.getPage(), pageSetting.getElementPerPage(), sort);
+        return PageRequest.of(pageSetting.getPageNumber(), pageSetting.getElementsPerPage(), sort);
     }
 
     private static Sort buildSort(PageSetting pageSetting) {
-        if(Objects.nonNull(pageSetting.getKey())) {
-            if (pageSetting.getDirection().equals(PassengerServiceConstants.DefaultValue.SORT_ASC)) {
-                return Sort.by(pageSetting.getKey()).ascending();
-            }
-            return Sort.by(pageSetting.getKey()).descending();
-        } else{
+        if(Objects.isNull(pageSetting.getSortField())) {
             return Sort.unsorted();
         }
+
+        Sort sort = Sort.by(pageSetting.getDirection());
+
+        if(pageSetting.getDirection().equals(PassengerServiceConstants.DefaultValue.SORT_ASC)) {
+            return sort.ascending();
+        }
+        return sort.descending();
     }
 }
