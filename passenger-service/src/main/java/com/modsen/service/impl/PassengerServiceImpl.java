@@ -53,8 +53,7 @@ public class PassengerServiceImpl implements PassengerService {
         Passenger foundPassenger = passengerRepository.findById(id)
                 .orElseThrow(() -> new PassengerNotFoundException(id));
 
-        return PassengerMapper.MAPPER_INSTANCE
-                .mapToPassengerResponse(foundPassenger);
+        return PassengerMapper.MAPPER_INSTANCE.mapToPassengerResponse(foundPassenger);
     }
 
     @Override
@@ -64,12 +63,10 @@ public class PassengerServiceImpl implements PassengerService {
         }
 
         validatePassengerRequest(passengerRequest);
-        Passenger updatedPassenger = PassengerMapper.MAPPER_INSTANCE
-                .mapToPassenger(passengerRequest);
+        Passenger updatedPassenger = PassengerMapper.MAPPER_INSTANCE.mapToPassenger(passengerRequest);
         updatedPassenger.setId(id);
 
-        return PassengerMapper.MAPPER_INSTANCE
-                .mapToPassengerResponse(
+        return PassengerMapper.MAPPER_INSTANCE.mapToPassengerResponse(
                     passengerRepository.save(updatedPassenger)
         );
     }

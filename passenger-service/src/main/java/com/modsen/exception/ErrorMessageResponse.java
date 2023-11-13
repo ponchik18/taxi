@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Builder
 public record ErrorMessageResponse(
-        Integer statusCode,
+        int statusCode,
         Date timestamp,
         String message
 ) {
