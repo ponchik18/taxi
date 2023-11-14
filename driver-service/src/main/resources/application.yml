@@ -3,6 +3,21 @@ server:
 spring:
   application:
     name: driver-service
+  datasource:
+    password: password
+    url: jdbc:postgresql://localhost:5432/driver
+    username: ponchik18
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/main-change-log.yml
 eureka:
   client:
     serviceUrl:

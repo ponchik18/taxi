@@ -71,26 +71,6 @@ public class PassengerServiceImpl implements PassengerService {
         );
     }
 
-    private void validatePassengerRequest(PassengerRequest passengerRequest) {
-        if(passengerRepository.existsByEmail(passengerRequest.getEmail())) {
-            throw new DuplicateKeyException(
-                    String.format(
-                            PassengerServiceConstants.Errors.Message.DUPLICATE_USER_WITH_EMAIL,
-                            passengerRequest.getEmail()
-                    )
-            );
-        }
-
-        if(passengerRepository.existsByPhone(passengerRequest.getPhone())) {
-            throw new DuplicateKeyException(
-                    String.format(
-                            PassengerServiceConstants.Errors.Message.DUPLICATE_USER_WITH_PHONE,
-                            passengerRequest.getPhone()
-                    )
-            );
-        }
-    }
-
     public void deletePassenger(long id) {
         if(passengerRepository.existsById(id)) {
             passengerRepository.deleteById(id);
@@ -99,5 +79,23 @@ public class PassengerServiceImpl implements PassengerService {
         }
     }
 
+    private void validatePassengerRequest(PassengerRequest passengerRequest) {
+        if(passengerRepository.existsByEmail(passengerRequest.getEmail())) {
+            throw new DuplicateKeyException(
+                    String.format(
+                            PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL,
+                            passengerRequest.getEmail()
+                    )
+            );
+        }
 
+        if(passengerRepository.existsByPhone(passengerRequest.getPhone())) {
+            throw new DuplicateKeyException(
+                    String.format(
+                            PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE,
+                            passengerRequest.getPhone()
+                    )
+            );
+        }
+    }
 }
