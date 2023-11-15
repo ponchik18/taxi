@@ -25,7 +25,7 @@ public interface DriverServiceConstants {
     interface Errors {
         interface Message {
             String DRIVER_NOT_FOUND = "Driver with id %d not found!";
-            String NOT_VALID_FIELD = "Driver in filled fields!";
+            String NOT_VALID_FIELD = "There is an error in the information entered in the driver's fields!";
             String DUPLICATE_DRIVER_WITH_EMAIL = "Driver with email '%s' has already defined";
             String DUPLICATE_DRIVER_WITH_PHONE = "Driver with phone '%s' has already defined";
             String DUPLICATE_DRIVER_WITH_LICENSE_NUMBER = "Driver with license number '%s' has already defined";

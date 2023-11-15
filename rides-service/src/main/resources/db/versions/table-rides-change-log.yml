@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-driver-table
+      id: create-rides-table
       author: ponchik18
       changes:
         - createTable:
-            tableName: driver
+            tableName: ride
             columns:
               - column:
                   name: id
@@ -13,26 +13,30 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: license_number
-                  type: VARCHAR(255)
-                  constraints:
-                    unique: true
+                  name: passenger_id
+                  type: bigint
               - column:
-                  name: first_name
-                  type: VARCHAR(255)
+                  name: driver_id
+                  type: bigint
               - column:
-                  name: last_name
+                  name: pick_up_location
                   type: VARCHAR(255)
               - column:
-                  name: email
+                  name: drop_location
                   type: VARCHAR(255)
-                  constraints:
-                    unique: true
               - column:
-                  name: phone
+                  name: start_time
+                  type: DATETIME
+              - column:
+                  name: end_time
+                  type: DATETIME
+              - column:
+                  name: cost
+                  type: decimal
+              - column:
+                  name: status
                   type: VARCHAR(255)
-                  constraints:
-                    unique: true
+
       rollback:
         - dropTable:
             tableName: driver
