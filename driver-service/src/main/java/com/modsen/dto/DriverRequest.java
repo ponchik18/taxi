@@ -24,4 +24,6 @@ public class DriverRequest {
     @NotEmpty(message = DriverServiceConstants.Validation.Message.PHONE_EMPTY)
     @Pattern(regexp = DriverServiceConstants.Validation.Format.PHONE_FORMAT, message = DriverServiceConstants.Validation.Message.PHONE_FORMAT)
     private String phone;
+    @NotEmpty(message = DriverServiceConstants.Validation.Message.DRIVER_STATUS_EMPTY)
+    private String driverStatus;
 }

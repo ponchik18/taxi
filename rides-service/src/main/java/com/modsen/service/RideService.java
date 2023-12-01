@@ -12,7 +12,7 @@ public interface RideService {
 
     RideResponse getRideById(long id);
 
-    RideResponse createRide(RideRequest rideRequest);
+    void createRide(RideRequest rideRequest);
 
     RideResponse updateRide(long id, RideRequest rideRequest);
 

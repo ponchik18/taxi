@@ -9,6 +9,7 @@ public interface DriverServiceConstants {
             String EMAIL_EMPTY = "Email is mandatory";
             String EMAIL_FORMAT = "Not the right format for email";
             String PHONE_EMPTY = "Phone is mandatory";
+            String DRIVER_STATUS_EMPTY = "Driver status is mandatory";
             String PHONE_FORMAT = "Not the right format for phone";
         }
 

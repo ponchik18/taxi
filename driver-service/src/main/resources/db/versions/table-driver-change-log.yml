@@ -33,6 +33,9 @@ databaseChangeLog:
                   type: VARCHAR(255)
                   constraints:
                     unique: true
+              - column:
+                  name: driver_status
+                  type: VARCHAR(255)
       rollback:
         - dropTable:
             tableName: driver

@@ -58,8 +58,13 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     public PassengerResponse updatePassenger(long id, PassengerRequest passengerRequest) {
-        if(!passengerRepository.existsById(id)){
-            throw new PassengerNotFoundException(id);
+        Passenger passenger = passengerRepository.findById(id)
+                        .orElseThrow(()-> new PassengerNotFoundException(id));
+        if(!passenger.getEmail().equals(passengerRequest.getEmail())) {
+            validatePassengerRequestByEmail(passengerRequest);
+        }
+        if(!passenger.getPhone().equals(passengerRequest.getPhone())) {
+            validatePassengerRequestByPhone(passengerRequest);
         }
 
         validatePassengerRequest(passengerRequest);
@@ -80,20 +85,28 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     private void validatePassengerRequest(PassengerRequest passengerRequest) {
-        if(passengerRepository.existsByEmail(passengerRequest.getEmail())) {
-            throw new DuplicateKeyException(
-                    String.format(
-                            PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL,
-                            passengerRequest.getEmail()
-                    )
-            );
-        }
+        validatePassengerRequestByEmail(passengerRequest);
 
+        validatePassengerRequestByPhone(passengerRequest);
+    }
+
+    private void validatePassengerRequestByPhone(PassengerRequest passengerRequest) {
         if(passengerRepository.existsByPhone(passengerRequest.getPhone())) {
             throw new DuplicateKeyException(
                     String.format(
                             PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE,
                             passengerRequest.getPhone()
+                    )
+            );
+        }
+    }
+
+    private void validatePassengerRequestByEmail(PassengerRequest passengerRequest) {
+        if(passengerRepository.existsByEmail(passengerRequest.getEmail())) {
+            throw new DuplicateKeyException(
+                    String.format(
+                            PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL,
+                            passengerRequest.getEmail()
                     )
             );
         }

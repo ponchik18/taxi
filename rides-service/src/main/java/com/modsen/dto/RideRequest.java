@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -18,11 +19,9 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RideRequest {
+public class RideRequest implements Serializable {
     @Min(value = 1, message = RidesServiceConstants.Validation.Message.PASSENGER_ID_NOT_MIN)
     private Long passengerId;
-    @Min(value = 1, message = RidesServiceConstants.Validation.Message.DRIVER_ID_NOT_MIN)
-    private Long driverId;
     @NotEmpty(message = RidesServiceConstants.Validation.Message.PICK_UP_LOCATION_EMPTY)
     private String pickUpLocation;
     @NotEmpty(message = RidesServiceConstants.Validation.Message.DROP_LOCATION_EMPTY)

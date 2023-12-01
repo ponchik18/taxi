@@ -18,7 +18,7 @@ public class PageRequestFactory {
             return Sort.unsorted();
         }
 
-        Sort sort = Sort.by(pageSetting.getDirection());
+        Sort sort = Sort.by(pageSetting.getSortField());
 
         if(pageSetting.getDirection().equals(RidesServiceConstants.DefaultValue.SORT_ASC)) {
             return sort.ascending();

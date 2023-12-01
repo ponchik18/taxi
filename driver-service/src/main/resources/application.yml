@@ -18,7 +18,31 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/main-change-log.yml
+  kafka:
+    bootstrap-servers: localhost:9092
+    sent-topic: save-ride
+    accepted-topic: create-ride
+    group_id: drive-service
+    admin:
+      auto-create: true
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8000/eureka
+
+resilience4j.circuit-breaker:
+  instances:
+    myProjectAllRemoteCallsCB:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      slidingWindowType: COUNT_BASED
+      permittedNumberOfCallsInHalfOpenState: 4
+      minimumNumberOfCalls: 10
+      waitDurationInOpenState: 5s
+      slowCallRateThreshold: 50
+      slowCallDurationThreshold: 10
+      failureRateThreshold: 50
+management:
+  health:
+    circuit-breakers:
+      enabled: true

@@ -3,7 +3,6 @@ package com.modsen.constants;
 public interface RidesServiceConstants {
     interface Validation {
         interface Message {
-            String DRIVER_ID_NOT_MIN = "Driver id should be more than 1";
             String PASSENGER_ID_NOT_MIN = "Passenger id should be more than 1";
             String PICK_UP_LOCATION_EMPTY = "Pick up location is mandatory";
             String DROP_LOCATION_EMPTY = "Drop location is mandatory";

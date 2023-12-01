@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: db/versions/table-rating-change-log.yml

@@ -17,9 +17,9 @@ import java.util.Map;
 @RestControllerAdvice
 public class DriverExceptionHandler {
 
-    @ExceptionHandler(DriverNotFoundException.class)
+    @ExceptionHandler({DriverNotFoundException.class, NoHandlerFoundException.class, DriverStatusNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessageResponse handleDriverNotFoundException(DriverNotFoundException exception) {
+    public ErrorMessageResponse handleNotFoundException(DriverNotFoundException exception) {
 
         return ErrorMessageResponse.builder()
                 .statusCode(HttpStatus.NOT_FOUND.value())
@@ -45,17 +45,6 @@ public class DriverExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(NoHandlerFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessageResponse handleResourceNotFoundException(NoHandlerFoundException exception) {
-        return ErrorMessageResponse.builder()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .timestamp(new Date())
-                .message(exception.getMessage())
-                .build();
-    }
-
-
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorMessageResponse handleDuplicateKeyException(DuplicateKeyException exception) {
@@ -68,7 +57,7 @@ public class DriverExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessageResponse handle(Exception exception) {
+    public ErrorMessageResponse handleInternalServerError(Exception exception) {
         return ErrorMessageResponse.builder()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .timestamp(new Date())

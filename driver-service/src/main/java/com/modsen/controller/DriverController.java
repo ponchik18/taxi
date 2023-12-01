@@ -40,7 +40,7 @@ public class DriverController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public DriverResponse getDriverById(@PathVariable long id) {
-        return driverService.getDriversById(id);
+        return driverService.getDriverById(id);
     }
 
     @PutMapping("/{id}")

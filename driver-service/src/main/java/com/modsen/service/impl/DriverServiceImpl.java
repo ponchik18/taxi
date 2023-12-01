@@ -37,7 +37,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverResponse getDriversById(long id) {
+    public DriverResponse getDriverById(long id) {
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(()->new DriverNotFoundException(id));
         return DriverMapper.MAPPER_INSTANCE.mapToDriverResponse(driver);
@@ -53,8 +53,16 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public DriverResponse updateDriver(long id, DriverRequest driverRequest) {
-        if(driverRepository.existsById(id)) {
-            throw new DriverNotFoundException(id);
+        Driver driver = driverRepository.findById(id)
+                        .orElseThrow(()->new DriverNotFoundException(id));
+        if(!driver.getEmail().equals(driverRequest.getEmail())) {
+            validateDriverRequestByEmail(driverRequest);
+        }
+        if(!driver.getPhone().equals(driverRequest.getPhone())) {
+            validateDriverRequestByPhone(driverRequest);
+        }
+        if(!driver.getLicenseNumber().equals(driverRequest.getLicenseNumber())) {
+            validateDriverRequestByLicenseNumber(driverRequest);
         }
 
         validateDriverRequest(driverRequest);
@@ -76,15 +84,26 @@ public class DriverServiceImpl implements DriverService {
     }
 
     private void validateDriverRequest(DriverRequest driverRequest) {
-        if(driverRepository.existsByEmail(driverRequest.getEmail())) {
+        validateDriverRequestByEmail(driverRequest);
+
+        validateDriverRequestByPhone(driverRequest);
+
+        validateDriverRequestByLicenseNumber(driverRequest);
+
+    }
+
+    private void validateDriverRequestByLicenseNumber(DriverRequest driverRequest) {
+        if(driverRepository.existsByLicenseNumber(driverRequest.getLicenseNumber())) {
             throw new DuplicateKeyException(
                     String.format(
-                            DriverServiceConstants.Errors.Message.DUPLICATE_DRIVER_WITH_EMAIL,
-                            driverRequest.getEmail()
+                            DriverServiceConstants.Errors.Message.DUPLICATE_DRIVER_WITH_LICENSE_NUMBER,
+                            driverRequest.getLicenseNumber()
                     )
             );
         }
+    }
 
+    private void validateDriverRequestByPhone(DriverRequest driverRequest) {
         if(driverRepository.existsByPhone(driverRequest.getPhone())) {
             throw new DuplicateKeyException(
                     String.format(
@@ -93,12 +112,14 @@ public class DriverServiceImpl implements DriverService {
                     )
             );
         }
+    }
 
-        if(driverRepository.existsByLicenseNumber(driverRequest.getLicenseNumber())) {
+    private void validateDriverRequestByEmail(DriverRequest driverRequest) {
+        if(driverRepository.existsByEmail(driverRequest.getEmail())) {
             throw new DuplicateKeyException(
                     String.format(
-                            DriverServiceConstants.Errors.Message.DUPLICATE_DRIVER_WITH_LICENSE_NUMBER,
-                            driverRequest.getLicenseNumber()
+                            DriverServiceConstants.Errors.Message.DUPLICATE_DRIVER_WITH_EMAIL,
+                            driverRequest.getEmail()
                     )
             );
         }

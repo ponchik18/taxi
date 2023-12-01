@@ -1,4 +1,4 @@
-package com.modsen.service.service;
+package com.modsen.service.impl;
 
 import com.modsen.dto.RideListResponse;
 import com.modsen.dto.RideRequest;
@@ -11,16 +11,24 @@ import com.modsen.repository.RideRepository;
 import com.modsen.service.RideService;
 import com.modsen.util.PageRequestFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
+    private final MessageChannel producingChannel;
 
+    @Value("${spring.kafka.sent-topic}")
+    private String springIntegrationKafkaAcceptedTopic;
     @Override
     public RideListResponse getAllRide(PageSetting pageSetting) {
         PageRequest pageRequest = PageRequestFactory.buildPageRequest(pageSetting);
@@ -40,10 +48,11 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public RideResponse createRide(RideRequest rideRequest) {
-        Ride newRide = RideMapper.MAPPER_INSTANCE.mapToRide(rideRequest);
-        Ride savedRide = rideRepository.save(newRide);
-        return RideMapper.MAPPER_INSTANCE.mapToRideResponse(savedRide);
+    public void createRide(RideRequest rideRequest) {
+        producingChannel.send(new GenericMessage<>(
+                rideRequest,
+                Collections.singletonMap(KafkaHeaders.TOPIC, springIntegrationKafkaAcceptedTopic))
+        );
     }
 
     @Override
@@ -67,4 +76,10 @@ public class RideServiceImpl implements RideService {
 
         rideRepository.deleteById(id);
     }
+
+//    @KafkaListener
+//    public void listen(RideRequest rideRequest) {
+//        Ride newRide = RideMapper.MAPPER_INSTANCE.mapToRide(rideRequest);
+//        Ride savedRide = rideRepository.save(newRide);
+//    }
 }

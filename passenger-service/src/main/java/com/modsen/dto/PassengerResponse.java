@@ -9,5 +9,4 @@ public record PassengerResponse(
         String lastName,
         String email,
         String phone
-) {
-}
+) { }

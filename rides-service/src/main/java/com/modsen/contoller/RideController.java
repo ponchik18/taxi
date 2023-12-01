@@ -39,8 +39,8 @@ public class RideController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RideResponse createRide(@Valid @RequestBody RideRequest rideRequest) {
-        return rideService.createRide(rideRequest);
+    public void createRide(@Valid @RequestBody RideRequest rideRequest) {
+        rideService.createRide(rideRequest);
     }
 
     @PutMapping("/{id}")
