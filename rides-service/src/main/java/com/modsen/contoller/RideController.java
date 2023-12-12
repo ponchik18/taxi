@@ -1,9 +1,13 @@
 package com.modsen.contoller;
 
 import com.modsen.constants.RidesServiceConstants;
-import com.modsen.dto.RideListResponse;
-import com.modsen.dto.RideRequest;
-import com.modsen.dto.RideResponse;
+import com.modsen.dto.rating.RatingRequest;
+import com.modsen.dto.rides.ChangeRideStatusRequest;
+import com.modsen.dto.rides.RideDriverRequest;
+import com.modsen.dto.rides.RideListResponse;
+import com.modsen.dto.rides.RidePassengerRequest;
+import com.modsen.dto.rides.RideResponse;
+import com.modsen.dto.promo.PromoCodeApplyRequest;
 import com.modsen.model.PageSetting;
 import com.modsen.service.RideService;
 import jakarta.validation.Valid;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,8 +32,8 @@ public class RideController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public RideListResponse getAllRider(PageSetting pageSetting) {
-        return rideService.getAllRide(pageSetting);
+    public RideListResponse getAllRide(PageSetting pageSetting, @RequestParam(required = false) Long passengerId) {
+        return rideService.getAllRide(pageSetting, passengerId);
     }
 
     @GetMapping("/{id}")
@@ -39,19 +44,49 @@ public class RideController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createRide(@Valid @RequestBody RideRequest rideRequest) {
-        rideService.createRide(rideRequest);
+    public void createRide(@Valid @RequestBody RidePassengerRequest ridePassengerRequest) {
+        rideService.createRide(ridePassengerRequest);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public RideResponse updateRide(@PathVariable long id, @Valid @RequestBody RideRequest rideRequest) {
-        return rideService.updateRide(id, rideRequest);
+    public RideResponse updateRide(@PathVariable long id, @Valid @RequestBody RideDriverRequest rideDriverRequest) {
+        return rideService.updateRide(id, rideDriverRequest);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRide(@PathVariable long id) {
         rideService.deleteRide(id);
+    }
+
+    @PutMapping("/finish-ride")
+    @ResponseStatus(HttpStatus.OK)
+    public RideResponse finishRide(@Valid @RequestBody ChangeRideStatusRequest changeRideStatusRequest) {
+        return rideService.finishRide(changeRideStatusRequest);
+    }
+
+    @PutMapping("/cancel-ride")
+    @ResponseStatus(HttpStatus.OK)
+    public RideResponse cancelRide(@Valid @RequestBody ChangeRideStatusRequest changeRideStatusRequest) {
+        return rideService.cancelRide(changeRideStatusRequest);
+    }
+
+    @PutMapping("/confirm-driver-arrival")
+    @ResponseStatus(HttpStatus.OK)
+    public RideResponse confirmDriverArrival(@Valid @RequestBody ChangeRideStatusRequest changeRideStatusRequest) {
+        return rideService.confirmDriverArrival(changeRideStatusRequest);
+    }
+
+    @PostMapping("/create-rating")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createRatingForRide(@Valid @RequestBody RatingRequest ratingRequest) {
+        rideService.createRating(ratingRequest);
+    }
+
+    @PutMapping("/apply-promo-code")
+    @ResponseStatus(HttpStatus.OK)
+    public RideResponse applyPromoCode(@Valid @RequestBody PromoCodeApplyRequest promoCodeApplyRequest) {
+        return rideService.applyApplyCode(promoCodeApplyRequest);
     }
 }

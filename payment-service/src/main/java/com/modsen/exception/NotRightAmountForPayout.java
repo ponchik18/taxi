@@ -1,13 +1,12 @@
 package com.modsen.exception;
 
-import lombok.Getter;
-
 import java.math.BigDecimal;
 
-@Getter
+
 public class NotRightAmountForPayout extends RuntimeException {
-    private final BigDecimal actualBalance;
-    public NotRightAmountForPayout(BigDecimal actualBalance) {
-        this.actualBalance = actualBalance;
+
+    public NotRightAmountForPayout(BigDecimal actualBalance, BigDecimal amount) {
+        super(String.format("Not right amount for payout! Actual balance is '%f'. But you enter '%f'",
+                actualBalance.floatValue(), amount.floatValue()));
     }
 }

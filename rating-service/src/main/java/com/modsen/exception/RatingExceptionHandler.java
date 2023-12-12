@@ -16,9 +16,9 @@ import java.util.Map;
 @RestControllerAdvice
 public class RatingExceptionHandler {
 
-    @ExceptionHandler(RatingNotFoundException.class)
+    @ExceptionHandler({RatingNotFoundException.class, UserRoleNotFoundException.class, NoHandlerFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessageResponse handleRatingNotFoundException(RatingNotFoundException exception) {
+    public ErrorMessageResponse handleRatingNotFoundException(Exception exception) {
 
         return ErrorMessageResponse.builder()
                 .statusCode(HttpStatus.NOT_FOUND.value())
@@ -44,9 +44,9 @@ public class RatingExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(NoHandlerFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessageResponse handleResourceNotFoundException(NoHandlerFoundException exception) {
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorMessageResponse handle(Exception exception) {
         return ErrorMessageResponse.builder()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .timestamp(new Date())
@@ -54,11 +54,11 @@ public class RatingExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessageResponse handle(Exception exception) {
+    @ExceptionHandler(RatingAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorMessageResponse handleDuplicateKeyException(RatingNotFoundException exception) {
         return ErrorMessageResponse.builder()
-                .statusCode(HttpStatus.NOT_FOUND.value())
+                .statusCode(HttpStatus.CONFLICT.value())
                 .timestamp(new Date())
                 .message(exception.getMessage())
                 .build();

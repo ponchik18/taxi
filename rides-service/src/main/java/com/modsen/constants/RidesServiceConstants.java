@@ -6,11 +6,8 @@ public interface RidesServiceConstants {
             String PASSENGER_ID_NOT_MIN = "Passenger id should be more than 1";
             String PICK_UP_LOCATION_EMPTY = "Pick up location is mandatory";
             String DROP_LOCATION_EMPTY = "Drop location is mandatory";
-            String START_TIME_EMPTY = "Start time is mandatory";
-            String END_TIME_EMPTY = "End time is mandatory";
-            String STATUS_EMPTY = "Status is mandatory";
-            String COST_MORE_THAN_ZERO = "Cost must be greater than or equal to 0";
-            String END_TIME_IS_BEFORE_AFTER = "End time must be after start time";
+            String FIELD_EMPTY = "Field is mandatory";
+            String MARK_NOT_RIGHT_RANGE = "Mark should be equal or more than '1' and equal or less than '5'";
         }
     }
     interface DefaultValue {

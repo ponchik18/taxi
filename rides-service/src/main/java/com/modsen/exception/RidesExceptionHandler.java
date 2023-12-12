@@ -1,6 +1,7 @@
 package com.modsen.exception;
 
 import com.modsen.constants.RidesServiceConstants;
+import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -17,9 +18,9 @@ import java.util.Map;
 @RestControllerAdvice
 public class RidesExceptionHandler {
 
-    @ExceptionHandler(RideNotFoundException.class)
+    @ExceptionHandler({RideNotFoundException.class, ResourceNotFoundException.class, NoHandlerFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessageResponse handleRideNotFoundException(RideNotFoundException exception) {
+    public ErrorMessageResponse handleNotFoundException(Exception exception) {
 
         return ErrorMessageResponse.builder()
                 .statusCode(HttpStatus.NOT_FOUND.value())
@@ -44,17 +45,6 @@ public class RidesExceptionHandler {
                 .message(RidesServiceConstants.Errors.Message.NOT_VALID_FIELD)
                 .build();
     }
-
-    @ExceptionHandler(NoHandlerFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessageResponse handleResourceNotFoundException(NoHandlerFoundException exception) {
-        return ErrorMessageResponse.builder()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .timestamp(new Date())
-                .message(exception.getMessage())
-                .build();
-    }
-
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.CONFLICT)

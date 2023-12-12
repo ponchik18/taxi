@@ -1,6 +1,6 @@
 package com.modsen.config;
 
-import com.modsen.dto.RideRequest;
+import com.modsen.dto.rides.RideDriverRequest;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Configuration
 public class ProducerChannelConfig {
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${spring.integration.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     @Bean
@@ -32,19 +32,19 @@ public class ProducerChannelConfig {
     @Bean
     @ServiceActivator(inputChannel = "producingChannel")
     public MessageHandler kafkaMessageHandler() {
-        KafkaProducerMessageHandler<String, RideRequest> handler = new KafkaProducerMessageHandler<>(kafkaTemplate());
+        KafkaProducerMessageHandler<String, RideDriverRequest> handler = new KafkaProducerMessageHandler<>(kafkaTemplate());
         handler.setMessageKeyExpression(new LiteralExpression("kafka-integration"));
 
         return handler;
     }
 
     @Bean
-    public KafkaTemplate<String, RideRequest> kafkaTemplate() {
+    public KafkaTemplate<String, RideDriverRequest> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
     @Bean
-    public ProducerFactory<String, RideRequest> producerFactory() {
+    public ProducerFactory<String, RideDriverRequest> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
@@ -55,7 +55,7 @@ public class ProducerChannelConfig {
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         properties.put(ProducerConfig.LINGER_MS_CONFIG, 1);
-        properties.put("spring.json.trusted.packages", "com.modsen.dto");
+        properties.put("spring.json.trusted.packages", "com.modsen.dto.rides");
         return properties;
     }
 

@@ -19,16 +19,30 @@ spring:
     enabled: true
     change-log: classpath:db/main-change-log.yml
   kafka:
-    bootstrap-servers: localhost:9092
-    sent-topic: save-ride
-    accepted-topic: create-ride
-    group_id: drive-service
-    admin:
-      auto-create: true
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: cancel-ride
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "com.modsen.dto.driver"
+  integration:
+    kafka:
+      bootstrap-servers: localhost:9092
+      sent-topic: save-ride
+      accepted-topic: create-ride
+      group_id: drive-service
+
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8000/eureka
+    fetch-registry: true
+    register-with-eureka: true
 
 resilience4j.circuit-breaker:
   instances:

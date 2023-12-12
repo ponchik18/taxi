@@ -1,7 +1,7 @@
 package com.modsen.mapper;
 
-import com.modsen.dto.RideRequest;
-import com.modsen.dto.RideResponse;
+import com.modsen.dto.rides.RideDriverRequest;
+import com.modsen.dto.rides.RideResponse;
 import com.modsen.enums.RideStatus;
 import com.modsen.model.Ride;
 import jakarta.validation.Valid;
@@ -14,7 +14,7 @@ import java.util.List;
 public interface RideMapper {
     RideMapper MAPPER_INSTANCE = Mappers.getMapper(RideMapper.class);
 
-    Ride mapToRide(@Valid RideRequest rideRequest);
+    Ride mapToRide(@Valid RideDriverRequest rideDriverRequest);
 
     RideResponse mapToRideResponse(Ride ride);
 

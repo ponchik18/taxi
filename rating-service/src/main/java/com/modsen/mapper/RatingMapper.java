@@ -1,7 +1,7 @@
 package com.modsen.mapper;
 
-import com.modsen.dto.RatingRequest;
-import com.modsen.dto.RatingResponse;
+import com.modsen.dto.rating.RatingRequest;
+import com.modsen.dto.rating.RatingResponse;
 import com.modsen.enums.UserRole;
 import com.modsen.exception.UserRoleNotFoundException;
 import com.modsen.model.Rating;

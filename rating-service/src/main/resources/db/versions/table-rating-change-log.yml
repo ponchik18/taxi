@@ -19,8 +19,18 @@ databaseChangeLog:
                   name: mark
                   type: int
               - column:
-                  name: entity_type
+                  name: user_role
                   type: VARCHAR(255)
       rollback:
         - dropTable:
             tableName: rating
+  - changeSet:
+      id: add-column-to-rating
+      author: ponchik18
+      changes:
+        - addColumn:
+            tableName: rating
+            columns:
+              - column:
+                  name: ride_id
+                  type: bigint

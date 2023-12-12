@@ -1,7 +1,7 @@
 package com.modsen.mapper;
 
-import com.modsen.dto.PaymentRequest;
-import com.modsen.dto.PaymentResponse;
+import com.modsen.dto.payment.PaymentRequest;
+import com.modsen.dto.payment.PaymentResponse;
 import com.modsen.model.Payment;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

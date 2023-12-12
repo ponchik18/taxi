@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: create-rating-table
+      id: create-payment-table
       author: ponchik18
       changes:
         - createTable:
@@ -12,9 +12,6 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-              - column:
-                  name: payment_method
-                  type: VARCHAR(255)
               - column:
                   name: amount
                   type: decimal
@@ -48,7 +45,7 @@ databaseChangeLog:
                   name: card_holder
                   type: VARCHAR(255)
               - column:
-                  name: token
+                  name: customer_id
                   type: VARCHAR(255)
               - column:
                   name: user_role
@@ -56,6 +53,9 @@ databaseChangeLog:
               - column:
                   name: user_id
                   type: bigint
+              - column:
+                  name: token
+                  type: VARCHAR(255)
       rollback:
         - dropTable:
             tableName: credit_card
@@ -81,3 +81,37 @@ databaseChangeLog:
       rollback:
         - dropTable:
             tableName: driver_balance
+  - changeSet:
+      id: create-default-credit-card-table
+      author: ponchik18
+      changes:
+        - createTable:
+            tableName: default_credit_card
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: bigint
+              - column:
+                  name: user_role
+                  type: VARCHAR(255)
+              - column:
+                  name: customer_stripe_id
+                  type: VARCHAR(255)
+                  constraints:
+                    unique: true
+              - column:
+                  name: card_id
+                  type: bigint
+
+      rollback:
+        - dropTable:
+            tableName: default_credit_card
+        - dropUniqueConstraint:
+            constraintName: default_card_unique_entity
+            tableName: default_credit_card

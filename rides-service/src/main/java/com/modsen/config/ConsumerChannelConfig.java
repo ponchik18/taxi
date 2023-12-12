@@ -1,7 +1,6 @@
 package com.modsen.config;
 
-import com.modsen.dto.RideRequest;
-import com.modsen.dto.RideResponseWithDriver;
+import com.modsen.dto.rides.RideResponseWithDriver;
 import com.modsen.handler.RideResponseWithDriverHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -25,13 +24,13 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class ConsumerChannelConfig {
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${spring.integration.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${spring.kafka.accepted-topic}")
+    @Value("${spring.integration.kafka.accepted-topic}")
     private String springIntegrationKafkaAcceptedTopic;
 
-    @Value("${spring.kafka.group_id}")
+    @Value("${spring.integration.kafka.group_id}")
     private String springIntegrationKafkaGroupId;
 
 
@@ -50,7 +49,7 @@ public class ConsumerChannelConfig {
 
     @Bean
     @ServiceActivator(inputChannel = "consumerChannel")
-    public RideResponseWithDriverHandler rideRequestHandler() {
+    public RideResponseWithDriverHandler rideResponseWithDriverHandler() {
         return new RideResponseWithDriverHandler();
     }
 
@@ -73,9 +72,9 @@ public class ConsumerChannelConfig {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, springIntegrationKafkaGroupId);
-        // automatically reset the offset to the earliest offset
+
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        properties.put("spring.json.trusted.packages", "com.modsen.dto");
+        properties.put("spring.json.trusted.packages", "com.modsen.dto.rides");
         return properties;
     }
 }

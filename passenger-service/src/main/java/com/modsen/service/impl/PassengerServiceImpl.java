@@ -1,9 +1,9 @@
 package com.modsen.service.impl;
 
 import com.modsen.constants.PassengerServiceConstants;
-import com.modsen.dto.PassengerListResponse;
-import com.modsen.dto.PassengerRequest;
-import com.modsen.dto.PassengerResponse;
+import com.modsen.dto.passenger.PassengerListResponse;
+import com.modsen.dto.passenger.PassengerRequest;
+import com.modsen.dto.passenger.PassengerResponse;
 import com.modsen.exception.PassengerNotFoundException;
 import com.modsen.mapper.PassengerMapper;
 import com.modsen.model.PageSetting;

@@ -1,17 +1,18 @@
 package com.modsen.service;
 
-import com.modsen.dto.CreditCardRequest;
-import com.modsen.dto.PaymentRequest;
-import com.modsen.model.CreditCard;
-import com.modsen.model.Payment;
-import com.stripe.model.Charge;
+import com.modsen.dto.card.CreditCardRequest;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
 import com.stripe.model.Token;
 
 import java.math.BigDecimal;
 
 public interface StripeService {
     Token createCardToken(CreditCardRequest creditCardRequest);
-    Charge charge(String token, BigDecimal amount);
 
-    void processPayout(String recipientToken, BigDecimal amount);
+    void charge(String token, BigDecimal amount);
+
+    Customer getCustomer(String customerId, String email);
+
+    void addSourceToCustomer(Customer customer, Token token) throws StripeException;
 }

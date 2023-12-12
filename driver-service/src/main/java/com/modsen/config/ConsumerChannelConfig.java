@@ -1,7 +1,7 @@
 package com.modsen.config;
 
-import com.modsen.dto.RideRequest;
-import com.modsen.handler.RideRequestHandler;
+import com.modsen.dto.rides.RideDriverRequest;
+import com.modsen.handler.RideDriverRequestHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -24,13 +24,13 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class ConsumerChannelConfig {
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${spring.integration.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${spring.kafka.accepted-topic}")
+    @Value("${spring.integration.kafka.accepted-topic}")
     private String springIntegrationKafkaAcceptedTopic;
 
-    @Value("${spring.kafka.group_id}")
+    @Value("${spring.integration.kafka.group_id}")
     private String springIntegrationKafkaGroupId;
 
 
@@ -40,8 +40,8 @@ public class ConsumerChannelConfig {
     }
 
     @Bean
-    public KafkaMessageDrivenChannelAdapter<String, RideRequest> kafkaMessageDrivenChannelAdapter() {
-        KafkaMessageDrivenChannelAdapter<String, RideRequest> kafkaMessageDrivenChannelAdapter = new KafkaMessageDrivenChannelAdapter<>(kafkaListenerContainer());
+    public KafkaMessageDrivenChannelAdapter<String, RideDriverRequest> kafkaMessageDrivenChannelAdapter() {
+        KafkaMessageDrivenChannelAdapter<String, RideDriverRequest> kafkaMessageDrivenChannelAdapter = new KafkaMessageDrivenChannelAdapter<>(kafkaListenerContainer());
         kafkaMessageDrivenChannelAdapter.setOutputChannel(consumerChannel());
 
         return kafkaMessageDrivenChannelAdapter;
@@ -49,19 +49,19 @@ public class ConsumerChannelConfig {
 
     @Bean
     @ServiceActivator(inputChannel = "consumerChannel")
-    public RideRequestHandler rideRequestHandler() {
-        return new RideRequestHandler();
+    public RideDriverRequestHandler rideDriverRequestHandler() {
+        return new RideDriverRequestHandler();
     }
 
     @Bean
-    public ConcurrentMessageListenerContainer<String, RideRequest> kafkaListenerContainer() {
+    public ConcurrentMessageListenerContainer<String, RideDriverRequest> kafkaListenerContainer() {
         ContainerProperties containerProps = new ContainerProperties(springIntegrationKafkaAcceptedTopic);
 
         return new ConcurrentMessageListenerContainer<>(consumerFactory(), containerProps);
     }
 
     @Bean
-    public ConsumerFactory<String, RideRequest> consumerFactory() {
+    public ConsumerFactory<String, RideDriverRequest> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs());
     }
 
@@ -74,7 +74,7 @@ public class ConsumerChannelConfig {
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, springIntegrationKafkaGroupId);
         // automatically reset the offset to the earliest offset
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        properties.put("spring.json.trusted.packages", "com.modsen.dto");
+        properties.put("spring.json.trusted.packages", "com.modsen.dto.rating, com.modsen.dto.card, com.modsen.dto.promo,com.modsen.dto.rides,com.modsen.dto.payment");
         return properties;
     }
 }

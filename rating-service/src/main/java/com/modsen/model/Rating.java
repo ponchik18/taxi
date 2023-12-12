@@ -28,4 +28,5 @@ public class Rating {
     private Integer mark;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+    private Long rideId;
 }

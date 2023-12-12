@@ -1,6 +1,6 @@
 package com.modsen.exception;
 
-import com.modsen.dto.CreditCardRequest;
+import com.modsen.dto.card.CreditCardRequest;
 import lombok.Builder;
 
 import java.util.Date;

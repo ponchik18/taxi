@@ -1,11 +1,14 @@
 package com.modsen.contoller;
 
-import com.modsen.dto.PaymentRequest;
-import com.modsen.dto.PaymentResponse;
-import com.modsen.dto.PaymentListResponse;
-import com.modsen.dto.PayoutRequest;
-import com.modsen.dto.PayoutResponse;
+import com.modsen.dto.balance.DriverBalanceResponse;
+import com.modsen.dto.payment.PaymentRequest;
+import com.modsen.dto.payment.PaymentResponse;
+import com.modsen.dto.payment.PaymentListResponse;
+import com.modsen.dto.payment.PayoutRequest;
+import com.modsen.dto.payment.PayoutResponse;
+import com.modsen.model.PageSetting;
 import com.modsen.service.PaymentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,19 +27,25 @@ public class PaymentController {
 
     @GetMapping("/history")
     @ResponseStatus(HttpStatus.OK)
-    public PaymentListResponse getPaymentHistory(@RequestParam long passengerId) {
-        return paymentService.getPaymentHistory(passengerId);
+    public PaymentListResponse getPaymentHistory(PageSetting pageSetting) {
+        return paymentService.getPaymentHistory(pageSetting);
     }
 
     @PostMapping("/charge")
     @ResponseStatus(HttpStatus.CREATED)
-    public PaymentResponse charge(@RequestBody PaymentRequest paymentRequest) {
+    public PaymentResponse charge(@Valid  @RequestBody PaymentRequest paymentRequest) {
         return paymentService.charge(paymentRequest);
     }
 
     @PostMapping("/payout")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public PayoutResponse payout(@RequestBody PayoutRequest payoutRequest) {
+    public PayoutResponse payout(@Valid @RequestBody PayoutRequest payoutRequest) {
         return paymentService.payout(payoutRequest);
+    }
+
+    @GetMapping("/balance")
+    @ResponseStatus(HttpStatus.OK)
+    public DriverBalanceResponse getDriverBalance(@RequestParam long driverId) {
+        return paymentService.getDriverBalance(driverId);
     }
 }

@@ -1,7 +1,7 @@
 package com.modsen.mapper;
 
-import com.modsen.dto.CreditCardRequest;
-import com.modsen.dto.CreditCardResponse;
+import com.modsen.dto.card.CreditCardRequest;
+import com.modsen.dto.card.CreditCardResponse;
 import com.modsen.model.CreditCard;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

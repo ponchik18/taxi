@@ -1,9 +1,12 @@
 package com.modsen.service.impl;
 
 import com.modsen.constants.DriverServiceConstants;
-import com.modsen.dto.DriverListResponse;
-import com.modsen.dto.DriverRequest;
-import com.modsen.dto.DriverResponse;
+import com.modsen.dto.driver.DriverChangeStatusForKafkaRequest;
+import com.modsen.dto.driver.DriverListResponse;
+import com.modsen.dto.driver.DriverRequest;
+import com.modsen.dto.driver.DriverResponse;
+import com.modsen.dto.driver.DriverStatusChangeRequest;
+import com.modsen.enums.DriverStatus;
 import com.modsen.exception.DriverNotFoundException;
 import com.modsen.mapper.DriverMapper;
 import com.modsen.model.Driver;
@@ -14,6 +17,7 @@ import com.modsen.util.PageRequestFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DriverServiceImpl implements DriverService {
     private final DriverRepository driverRepository;
+    private final static String SPRING_KAFKA_LISTENER_GROUP_ID = "change-driver-status-listener";
+    private final static String SPRING_KAFKA_CHANGE_DRIVER_STATUS_TOPIC = "change-driver-status";
+
 
     @Override
     public DriverListResponse getAllDrivers(PageSetting pageSetting) {
@@ -81,6 +88,25 @@ public class DriverServiceImpl implements DriverService {
         } else {
             throw new DriverNotFoundException(id);
         }
+    }
+
+    @Override
+    public DriverResponse changeStatus(DriverStatusChangeRequest driverStatusChangeRequest) {
+        Driver driver = driverRepository.findById(driverStatusChangeRequest.getDriverId())
+                .orElseThrow(()->new DriverNotFoundException(driverStatusChangeRequest.getDriverId()));
+        driver.setDriverStatus(DriverStatus.valueOf(driverStatusChangeRequest.getStatus()));
+
+        return DriverMapper.MAPPER_INSTANCE.mapToDriverResponse(
+                driverRepository.save(driver)
+        );
+    }
+
+    @KafkaListener(topics = SPRING_KAFKA_CHANGE_DRIVER_STATUS_TOPIC, groupId = SPRING_KAFKA_LISTENER_GROUP_ID)
+    public void changeDriverStatus(DriverChangeStatusForKafkaRequest driverChangeStatusForKafkaRequest) {
+        Driver driver = driverRepository.findById(driverChangeStatusForKafkaRequest.getDriverId())
+                .orElseThrow(() -> new DriverNotFoundException(driverChangeStatusForKafkaRequest.getDriverId()));
+        driver.setDriverStatus(driverChangeStatusForKafkaRequest.getDriverStatus());
+        driverRepository.save(driver);
     }
 
     private void validateDriverRequest(DriverRequest driverRequest) {

@@ -1,9 +1,9 @@
 package com.modsen.contoller;
 
 import com.modsen.constants.RatingServiceConstants;
-import com.modsen.dto.RatingListResponse;
-import com.modsen.dto.RatingRequest;
-import com.modsen.dto.RatingResponse;
+import com.modsen.dto.rating.RatingListResponse;
+import com.modsen.dto.rating.RatingRequest;
+import com.modsen.dto.rating.RatingResponse;
 import com.modsen.service.RatingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,8 +26,8 @@ public class RatingController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public RatingListResponse getAllRating(@RequestParam(required = false) Long entityId) {
-        return ratingService.getAllRatingByEntityId(entityId);
+    public RatingListResponse getAllRating(@RequestParam(required = false) Long entityId, @RequestParam(required = false) String userRole) {
+        return ratingService.getAllRatingByEntityId(entityId, userRole);
     }
 
     @PostMapping
@@ -41,12 +40,6 @@ public class RatingController {
     @ResponseStatus(HttpStatus.OK)
     public RatingResponse getRatingById(@PathVariable long id) {
         return ratingService.getRatingById(id);
-    }
-
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public RatingResponse updateRating(@PathVariable long id, @Valid @RequestBody RatingRequest ratingRequest) {
-        return ratingService.updateRating(id, ratingRequest);
     }
 
     @DeleteMapping("/{id}")

@@ -3,14 +3,10 @@ package com.modsen.constants;
 public interface DriverServiceConstants {
     interface Validation {
         interface Message {
-            String LICENSE_NUMBER_EMPTY = "License number is mandatory";
-            String FIRST_NAME_EMPTY = "Firstname is mandatory";
-            String LASTNAME_EMPTY = "Lastname is mandatory";
-            String EMAIL_EMPTY = "Email is mandatory";
+            String FIELD_EMPTY = "Field number is mandatory";
             String EMAIL_FORMAT = "Not the right format for email";
-            String PHONE_EMPTY = "Phone is mandatory";
-            String DRIVER_STATUS_EMPTY = "Driver status is mandatory";
             String PHONE_FORMAT = "Not the right format for phone";
+            String VALUE_LESS_ZERO = "Value should be greater than one";
         }
 
         interface Format {

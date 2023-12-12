@@ -44,7 +44,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "create-ride:1:1,save-ride:1:1"
+      KAFKA_CREATE_TOPICS: "create-ride:1:1,save-ride:1:1,cancel-ride:1:1,create-rating:1:1,change-driver-status:1:1"
 
   kafka_manager:
     image: hlebalbau/kafka-manager:stable

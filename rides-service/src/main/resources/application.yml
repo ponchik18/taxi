@@ -18,24 +18,16 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/main-change-log.yml
-  kafka:
-    bootstrap-servers: localhost:9092
-    sent-topic: create-ride
-    accepted-topic: save-ride
-    group_id: rides-service
+  integration:
+    kafka:
+      bootstrap-servers: localhost:9092
+      sent-topic: create-ride
+      accepted-topic: save-ride
+      group_id: rides-service
 
-#    consumer:
-#      group-id: rides-service
-#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#      auto-offset-reset: earliest
-#    producer:
-#      bootstrap-servers: localhost:9092
-#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#    admin:
-#      auto-create: true
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8000/eureka
+    fetch-registry: true
+    register-with-eureka: true

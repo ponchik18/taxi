@@ -25,8 +25,9 @@ public class CreditCard {
     private Long id;
     private String cardNumber;
     private String cardHolder;
-    private String token;
+    private String customerId; // fix all with customer
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private Long userId;
+    private String token;
 }

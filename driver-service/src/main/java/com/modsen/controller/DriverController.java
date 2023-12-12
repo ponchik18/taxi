@@ -1,9 +1,10 @@
 package com.modsen.controller;
 
 import com.modsen.constants.DriverServiceConstants;
-import com.modsen.dto.DriverListResponse;
-import com.modsen.dto.DriverRequest;
-import com.modsen.dto.DriverResponse;
+import com.modsen.dto.driver.DriverListResponse;
+import com.modsen.dto.driver.DriverRequest;
+import com.modsen.dto.driver.DriverResponse;
+import com.modsen.dto.driver.DriverStatusChangeRequest;
 import com.modsen.model.PageSetting;
 import com.modsen.service.DriverService;
 import jakarta.validation.Valid;
@@ -53,5 +54,11 @@ public class DriverController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDriver(@PathVariable long id) {
         driverService.deleteDriver(id);
+    }
+
+    @PutMapping("/change-status")
+    @ResponseStatus(HttpStatus.OK)
+    public DriverResponse changeStatus(@RequestBody DriverStatusChangeRequest driverStatusChangeRequest) {
+        return driverService.changeStatus(driverStatusChangeRequest);
     }
 }

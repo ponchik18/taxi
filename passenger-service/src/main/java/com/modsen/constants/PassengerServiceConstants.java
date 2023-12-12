@@ -3,11 +3,8 @@ package com.modsen.constants;
 public interface PassengerServiceConstants {
     interface Validation {
         interface Message {
-            String FIRST_NAME_EMPTY = "Firstname is mandatory";
-            String LAST_NAME_EMPTY = "Lastname is mandatory";
-            String EMAIL_EMPTY = "Email is mandatory";
+            String FIELD_EMPTY = "Field is mandatory";
             String EMAIL_FORMAT = "Not the right format for email";
-            String PHONE_EMPTY = "Phone is mandatory";
             String PHONE_FORMAT = "Not the right format for phone";
         }
 
@@ -26,7 +23,7 @@ public interface PassengerServiceConstants {
     interface Errors {
         interface Message {
             String PASSENGER_NOT_FOUND = "Passenger with id %d not found!";
-            String NOT_VALID_FIELD = "Passenger in filled fields!";
+            String NOT_VALID_FIELD = "Error in filled fields!";
             String DUPLICATE_PASSENGER_WITH_EMAIL = "Passenger with email '%s' has already defined";
             String DUPLICATE_PASSENGER_WITH_PHONE = "Passenger with phone '%s' has already defined";
         }

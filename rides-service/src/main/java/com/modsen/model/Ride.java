@@ -35,4 +35,5 @@ public class Ride {
     private BigDecimal cost;
     @Enumerated(EnumType.STRING)
     private RideStatus status;
+    private Boolean isPromoCodeApplied = Boolean.FALSE;
 }

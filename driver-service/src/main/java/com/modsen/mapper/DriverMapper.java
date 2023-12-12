@@ -1,7 +1,7 @@
 package com.modsen.mapper;
 
-import com.modsen.dto.DriverRequest;
-import com.modsen.dto.DriverResponse;
+import com.modsen.dto.driver.DriverRequest;
+import com.modsen.dto.driver.DriverResponse;
 import com.modsen.enums.DriverStatus;
 import com.modsen.exception.DriverStatusNotFoundException;
 import com.modsen.model.Driver;
