@@ -1,5 +1,6 @@
 package com.modsen.contoller;
 
+import com.modsen.constants.PaymentServiceConstants;
 import com.modsen.dto.balance.DriverBalanceResponse;
 import com.modsen.dto.payment.PaymentRequest;
 import com.modsen.dto.payment.PaymentResponse;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/payment")
+@RequestMapping(PaymentServiceConstants.BasePath.PAYMENT_CONTROLLER_PATH)
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;

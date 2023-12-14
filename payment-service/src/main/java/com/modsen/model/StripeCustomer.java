@@ -19,13 +19,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class DefaultCreditCard {
+public class StripeCustomer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long userId;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-    private String customerStripeId;
-    private Long cardId;
+    private String customerId;
 }

@@ -20,11 +20,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class RideDriverRequestHandler implements MessageHandler {
-
     private DriverRepository driverRepository;
     private MessageChannel producingChannel;
     @Value("${spring.integration.kafka.sent-topic}")
     private String springIntegrationKafkaSentTopic;
+
     @Autowired
     public void setDriverRepository(DriverRepository driverRepository) {
         this.driverRepository = driverRepository;
@@ -41,7 +41,7 @@ public class RideDriverRequestHandler implements MessageHandler {
         RideDriverRequest rideDriverRequest = (RideDriverRequest) message.getPayload();
 
         List<Driver> drivers = driverRepository.findAllByDriverStatus(DriverStatus.AVAILABLE);
-        if(!drivers.isEmpty()){
+        if (!drivers.isEmpty()) {
             Driver driver = drivers.get(0);
             RideResponseWithDriver rideResponseWithDriver = RideResponseWithDriver.builder()
                     .rideDriverRequest(rideDriverRequest)

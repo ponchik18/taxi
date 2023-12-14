@@ -33,7 +33,7 @@ public class PassengerServiceImpl implements PassengerService {
 
         return PassengerListResponse.builder()
                 .passengers(passengerResponses)
-                .totalPassengerCount(passengerResponses.size())
+                .passengerCount(passengerResponses.size())
                 .build();
     }
 
@@ -59,28 +59,32 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public PassengerResponse updatePassenger(long id, PassengerRequest passengerRequest) {
         Passenger passenger = passengerRepository.findById(id)
-                        .orElseThrow(()-> new PassengerNotFoundException(id));
-        if(!passenger.getEmail().equals(passengerRequest.getEmail())) {
-            validatePassengerRequestByEmail(passengerRequest);
-        }
-        if(!passenger.getPhone().equals(passengerRequest.getPhone())) {
-            validatePassengerRequestByPhone(passengerRequest);
-        }
+                .orElseThrow(() -> new PassengerNotFoundException(id));
+        validatePassengerUpdateRequest(passengerRequest, passenger);
 
-        validatePassengerRequest(passengerRequest);
         Passenger updatedPassenger = PassengerMapper.MAPPER_INSTANCE.mapToPassenger(passengerRequest);
         updatedPassenger.setId(id);
 
         return PassengerMapper.MAPPER_INSTANCE.mapToPassengerResponse(
-                    passengerRepository.save(updatedPassenger)
+                passengerRepository.save(updatedPassenger)
         );
     }
 
+    @Override
     public void deletePassenger(long id) {
-        if(passengerRepository.existsById(id)) {
-            passengerRepository.deleteById(id);
-        } else {
+        if (!passengerRepository.existsById(id)) {
             throw new PassengerNotFoundException(id);
+        }
+
+        passengerRepository.deleteById(id);
+    }
+
+    private void validatePassengerUpdateRequest(PassengerRequest passengerRequest, Passenger passenger) {
+        if (!passenger.getEmail().equals(passengerRequest.getEmail())) {
+            validatePassengerRequestByEmail(passengerRequest);
+        }
+        if (!passenger.getPhone().equals(passengerRequest.getPhone())) {
+            validatePassengerRequestByPhone(passengerRequest);
         }
     }
 
@@ -91,24 +95,22 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     private void validatePassengerRequestByPhone(PassengerRequest passengerRequest) {
-        if(passengerRepository.existsByPhone(passengerRequest.getPhone())) {
-            throw new DuplicateKeyException(
-                    String.format(
-                            PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE,
-                            passengerRequest.getPhone()
-                    )
+        if (passengerRepository.existsByPhone(passengerRequest.getPhone())) {
+            String error = String.format(
+                    PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE,
+                    passengerRequest.getPhone()
             );
+            throw new DuplicateKeyException(error);
         }
     }
 
     private void validatePassengerRequestByEmail(PassengerRequest passengerRequest) {
-        if(passengerRepository.existsByEmail(passengerRequest.getEmail())) {
-            throw new DuplicateKeyException(
-                    String.format(
-                            PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL,
-                            passengerRequest.getEmail()
-                    )
+        if (passengerRepository.existsByEmail(passengerRequest.getEmail())) {
+            String error = String.format(
+                    PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL,
+                    passengerRequest.getEmail()
             );
+            throw new DuplicateKeyException(error);
         }
     }
 }

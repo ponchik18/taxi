@@ -5,7 +5,7 @@ import com.modsen.exception.UserRoleNotFoundException;
 
 public class UserRoleMapper {
     public static UserRole mapToUserRole(String userRole) {
-        try{
+        try {
             return UserRole.valueOf(userRole);
         } catch (IllegalArgumentException exception) {
             throw new UserRoleNotFoundException(userRole);

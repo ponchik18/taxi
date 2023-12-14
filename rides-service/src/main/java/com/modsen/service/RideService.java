@@ -1,12 +1,11 @@
 package com.modsen.service;
 
-import com.modsen.dto.rating.RatingRequest;
+import com.modsen.dto.promo.PromoCodeApplyRequest;
 import com.modsen.dto.rides.ChangeRideStatusRequest;
 import com.modsen.dto.rides.RideDriverRequest;
 import com.modsen.dto.rides.RideListResponse;
 import com.modsen.dto.rides.RidePassengerRequest;
 import com.modsen.dto.rides.RideResponse;
-import com.modsen.dto.promo.PromoCodeApplyRequest;
 import com.modsen.model.PageSetting;
 
 public interface RideService {
@@ -29,6 +28,4 @@ public interface RideService {
     RideResponse applyApplyCode(PromoCodeApplyRequest promoCodeApplyRequest);
 
     RideResponse cancelRide(ChangeRideStatusRequest changeRideStatusRequest);
-
-    void createRating(RatingRequest ratingRequest);
 }

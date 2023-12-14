@@ -7,7 +7,7 @@ import com.modsen.dto.card.DefaultCreditCardRequest;
 
 public interface CreditCardService {
     CreditCardResponse addCreditCard(CreditCardRequest creditCardRequest);
-    void deleteCreditCard(long id);
+    void deleteCreditCard(long cardId, long userId, String userRole);
     CreditCardResponse getCreditCardById(long id);
     CreditCardListResponse getAllUserCreditCard(long userId, String userRole);
 

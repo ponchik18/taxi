@@ -40,3 +40,4 @@ build/
 /.idea/
 /zoo/
 /broker/
+/kafka-streams-future/

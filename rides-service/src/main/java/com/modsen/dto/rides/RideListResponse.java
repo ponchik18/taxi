@@ -7,6 +7,6 @@ import java.util.List;
 @Builder
 public record RideListResponse(
         List<RideResponse> rides,
-        int totalRidesCount
+        int ridesCount
 ) {
 }

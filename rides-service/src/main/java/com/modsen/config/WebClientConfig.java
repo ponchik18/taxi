@@ -1,5 +1,6 @@
 package com.modsen.config;
 
+import com.modsen.constants.RidesServiceConstants;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,16 +17,16 @@ public class WebClientConfig {
 
     @Bean
     public WebClient passengerServiceWebClient() {
-        return webClientBuilder().baseUrl("http://passenger-service/api/v1/passenger").build();
+        return webClientBuilder().baseUrl(RidesServiceConstants.Path.PASSENGER_SERVICE_PATH).build();
     }
 
     @Bean
     public WebClient paymentServiceWebClient() {
-        return webClientBuilder().baseUrl("http://payment-service/api/v1/payment").build();
+        return webClientBuilder().baseUrl(RidesServiceConstants.Path.PAYMENT_SERVICE_PATH).build();
     }
 
     @Bean
     public WebClient promoCodeServiceWebClient() {
-        return webClientBuilder().baseUrl("http://promo-code-service/api/v1/promo-code").build();
+        return webClientBuilder().baseUrl(RidesServiceConstants.Path.PROMO_CODE_SERVICE_PATH).build();
     }
 }

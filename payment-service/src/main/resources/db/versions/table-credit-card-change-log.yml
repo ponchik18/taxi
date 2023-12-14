@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-rating-table
+      id: create-credit-card-table
       author: ponchik18
       changes:
         - createTable:
-            tableName: rating
+            tableName: credit_card
             columns:
               - column:
                   name: id
@@ -13,17 +13,20 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: entity_id
-                  type: bigint
+                  name: card_number
+                  type: VARCHAR(255)
               - column:
-                  name: mark
-                  type: int
+                  name: card_holder
+                  type: VARCHAR(255)
               - column:
                   name: user_role
                   type: VARCHAR(255)
               - column:
-                  name: ride_id
+                  name: user_id
                   type: bigint
+              - column:
+                  name: stripe_card_id
+                  type: VARCHAR(255)
       rollback:
         - dropTable:
-            tableName: rating
+            tableName: credit_card

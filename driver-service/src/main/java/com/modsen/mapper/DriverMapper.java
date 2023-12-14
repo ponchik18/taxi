@@ -16,7 +16,9 @@ public interface DriverMapper {
     DriverMapper MAPPER_INSTANCE = Mappers.getMapper(DriverMapper.class);
 
     Driver mapToDriver(@Valid DriverRequest driverRequest);
+
     DriverResponse mapToDriverResponse(Driver driver);
+
     List<DriverResponse> mapToListOfDriverResponse(List<Driver> drivers);
 
     default DriverStatus mapStringToDriverStatus(String driverStatus) {

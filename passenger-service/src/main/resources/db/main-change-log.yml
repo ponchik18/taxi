@@ -1,3 +1,5 @@
 databaseChangeLog:
-  - include:
+  - # Start of include for table-passenger-change-log.yml
+    include:
       file: db/versions/table-passenger-change-log.yml
+  - # End of include for table-passenger-change-log.yml

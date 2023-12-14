@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-rating-table
+      id: create-stripe_customer-table
       author: ponchik18
       changes:
         - createTable:
-            tableName: rating
+            tableName: stripe_customer
             columns:
               - column:
                   name: id
@@ -13,17 +13,14 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: entity_id
+                  name: user_id
                   type: bigint
               - column:
-                  name: mark
-                  type: int
+                  name: customer_id
+                  type: VARCHAR(255)
               - column:
                   name: user_role
                   type: VARCHAR(255)
-              - column:
-                  name: ride_id
-                  type: bigint
       rollback:
         - dropTable:
-            tableName: rating
+            tableName: customers_id

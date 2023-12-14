@@ -45,16 +45,13 @@ databaseChangeLog:
                   name: card_holder
                   type: VARCHAR(255)
               - column:
-                  name: customer_id
-                  type: VARCHAR(255)
-              - column:
                   name: user_role
                   type: VARCHAR(255)
               - column:
                   name: user_id
                   type: bigint
               - column:
-                  name: token
+                  name: stripe_card_id
                   type: VARCHAR(255)
       rollback:
         - dropTable:
@@ -82,11 +79,11 @@ databaseChangeLog:
         - dropTable:
             tableName: driver_balance
   - changeSet:
-      id: create-default-credit-card-table
+      id: create-stripe_customer-table
       author: ponchik18
       changes:
         - createTable:
-            tableName: default_credit_card
+            tableName: stripe_customer
             columns:
               - column:
                   name: id
@@ -98,20 +95,11 @@ databaseChangeLog:
                   name: user_id
                   type: bigint
               - column:
+                  name: customer_id
+                  type: VARCHAR(255)
+              - column:
                   name: user_role
                   type: VARCHAR(255)
-              - column:
-                  name: customer_stripe_id
-                  type: VARCHAR(255)
-                  constraints:
-                    unique: true
-              - column:
-                  name: card_id
-                  type: bigint
-
       rollback:
         - dropTable:
-            tableName: default_credit_card
-        - dropUniqueConstraint:
-            constraintName: default_card_unique_entity
-            tableName: default_credit_card
+            tableName: customers_id

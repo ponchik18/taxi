@@ -7,6 +7,6 @@ import java.util.List;
 @Builder
 public record CreditCardListResponse (
         List<CreditCardResponse> creditCardList,
-        int totalCountOfCard
+        int countOfCard
 ) {
 }

@@ -1,18 +1,17 @@
 package com.modsen.service.impl;
 
-import com.modsen.dto.driver.DriverChangeStatusForKafkaRequest;
 import com.modsen.dto.card.CreditCardResponse;
+import com.modsen.dto.driver.DriverChangeStatusForKafkaRequest;
 import com.modsen.dto.passenger.PassengerResponse;
-import com.modsen.dto.rating.RatingRequest;
-import com.modsen.dto.rides.ChangeRideStatusRequest;
-import com.modsen.dto.rides.RideListResponse;
-import com.modsen.dto.rides.RidePassengerRequest;
-import com.modsen.dto.rides.RideDriverRequest;
-import com.modsen.dto.rides.RideResponse;
 import com.modsen.dto.payment.PaymentRequest;
 import com.modsen.dto.payment.PaymentResponse;
 import com.modsen.dto.promo.PromoCodeApplyRequest;
 import com.modsen.dto.promo.PromoCodeResponse;
+import com.modsen.dto.rides.ChangeRideStatusRequest;
+import com.modsen.dto.rides.RideDriverRequest;
+import com.modsen.dto.rides.RideListResponse;
+import com.modsen.dto.rides.RidePassengerRequest;
+import com.modsen.dto.rides.RideResponse;
 import com.modsen.enums.DriverStatus;
 import com.modsen.enums.RideStatus;
 import com.modsen.enums.UserRole;
@@ -45,6 +44,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,16 +58,16 @@ public class RideServiceImpl implements RideService {
 
     @Value("${spring.integration.kafka.sent-topic}")
     private String springIntegrationKafkaAcceptedTopic;
-    private final static String SPRING_KAFKA_CHANGE_DRIVER_STATUS_TOPIC = "change-driver-status";
-    private final static String SPRING_KAFKA_CREATE_RATING_TOPIC = "create-rating";
+    @Value("${spring.kafka.producer.change-driver-status-topic}")
+    private String springKafkaChangeDriverStatus;
 
     @Override
     public RideListResponse getAllRide(PageSetting pageSetting, Long passengerId) {
-        if(Objects.nonNull(passengerId)) {
+        if (Objects.nonNull(passengerId)) {
             List<Ride> rides = rideRepository.findAllByPassengerId(passengerId);
             return RideListResponse.builder()
                     .rides(RideMapper.MAPPER_INSTANCE.mapToListOfRideResponse(rides))
-                    .totalRidesCount(rides.size())
+                    .ridesCount(rides.size())
                     .build();
         }
         PageRequest pageRequest = PageRequestFactory.buildPageRequest(pageSetting);
@@ -75,19 +75,19 @@ public class RideServiceImpl implements RideService {
                 .toList();
         return RideListResponse.builder()
                 .rides(RideMapper.MAPPER_INSTANCE.mapToListOfRideResponse(rides))
-                .totalRidesCount(rides.size())
+                .ridesCount(rides.size())
                 .build();
     }
 
     @Override
     public RideResponse getRideById(long id) {
         Ride ride = rideRepository.findById(id)
-                .orElseThrow(()->new RideNotFoundException(id));
+                .orElseThrow(() -> new RideNotFoundException(id));
         return RideMapper.MAPPER_INSTANCE.mapToRideResponse(ride);
     }
 
     @Override
-    public void createRide( RidePassengerRequest ridePassengerRequest) {
+    public void createRide(RidePassengerRequest ridePassengerRequest) {
         validatePassenger(ridePassengerRequest.getPassengerId());
         RideDriverRequest rideDriverRequest = RideDriverRequest.builder()
                 .cost(generateCost())
@@ -103,21 +103,14 @@ public class RideServiceImpl implements RideService {
         );
     }
 
-    @Override
-    public void createRating(RatingRequest ratingRequest) {
-        customKafkaTemplate.send(
-                SPRING_KAFKA_CREATE_RATING_TOPIC,
-                ratingRequest);
-    }
-
     private BigDecimal generateCost() {
-        return BigDecimal.valueOf(Math.random()*100+1)
+        return BigDecimal.valueOf(Math.random() * 100 + 1)
                 .setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
     public RideResponse updateRide(long id, RideDriverRequest rideDriverRequest) {
-        if(!rideRepository.existsById(id)){
+        if (!rideRepository.existsById(id)) {
             throw new RideNotFoundException(id);
         }
 
@@ -130,32 +123,33 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public void deleteRide(long id) {
-        if(!rideRepository.existsById(id)) {
+        if (!rideRepository.existsById(id)) {
             throw new RideNotFoundException(id);
         }
 
         rideRepository.deleteById(id);
     }
+
     @Override
     public RideResponse cancelRide(ChangeRideStatusRequest changeRideStatusRequest) {
         Ride ride = getRideByChangeRideStatusRequest(changeRideStatusRequest);
-        if(ride.getStatus() != RideStatus.DRIVER_EN_ROUTE) {
-            throw new RideCancelException(ride.getId(),ride.getStatus());
+        if (ride.getStatus() != RideStatus.DRIVER_EN_ROUTE) {
+            throw new RideCancelException(ride.getId(), ride.getStatus());
         }
         customKafkaTemplate.send(
-                SPRING_KAFKA_CHANGE_DRIVER_STATUS_TOPIC,
+                springKafkaChangeDriverStatus,
                 new DriverChangeStatusForKafkaRequest(ride.getDriverId(), DriverStatus.AVAILABLE)
         );
-       ride.setStatus(RideStatus.TRIP_CANCELED);
-       return RideMapper.MAPPER_INSTANCE.mapToRideResponse(
-               rideRepository.save(ride)
-       );
+        ride.setStatus(RideStatus.TRIP_CANCELED);
+        return RideMapper.MAPPER_INSTANCE.mapToRideResponse(
+                rideRepository.save(ride)
+        );
     }
 
     @Override
     public RideResponse confirmDriverArrival(ChangeRideStatusRequest changeRideStatusRequest) {
         Ride ride = getRideByChangeRideStatusRequest(changeRideStatusRequest);
-        if(ride.getStatus() == RideStatus.DRIVER_EN_ROUTE) {
+        if (ride.getStatus() == RideStatus.DRIVER_EN_ROUTE) {
             ride.setStatus(RideStatus.IN_PROGRESS);
         }
         return RideMapper.MAPPER_INSTANCE.mapToRideResponse(
@@ -166,7 +160,7 @@ public class RideServiceImpl implements RideService {
     @Override
     public RideResponse finishRide(ChangeRideStatusRequest changeRideStatusRequest) {
         Ride ride = getRideByChangeRideStatusRequest(changeRideStatusRequest);
-        if(ride.getStatus()!= RideStatus.IN_PROGRESS) {
+        if (ride.getStatus() != RideStatus.IN_PROGRESS) {
             return RideMapper.MAPPER_INSTANCE.mapToRideResponse(ride);
         }
         PaymentRequest paymentRequest = PaymentRequest.builder()
@@ -178,18 +172,9 @@ public class RideServiceImpl implements RideService {
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
 
-        paymentServiceWebClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/charge")
-                        .build())
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(paymentRequest))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle4xxError)
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle5xxError)
-                .bodyToMono(PaymentResponse.class)
-                .block();
+        makeCharge(paymentRequest);
         customKafkaTemplate.send(
-                SPRING_KAFKA_CHANGE_DRIVER_STATUS_TOPIC,
+                springKafkaChangeDriverStatus,
                 new DriverChangeStatusForKafkaRequest(ride.getDriverId(), DriverStatus.AVAILABLE)
         );
 
@@ -201,38 +186,53 @@ public class RideServiceImpl implements RideService {
     @Override
     public RideResponse applyApplyCode(PromoCodeApplyRequest promoCodeApplyRequest) {
         Ride ride = rideRepository.findByIdAndPassengerId(promoCodeApplyRequest.getRideId(), promoCodeApplyRequest.getPassengerId())
-                .orElseThrow(()->new RideNotFoundException(promoCodeApplyRequest.getRideId()));
-        if(ride.getIsPromoCodeApplied()) {
+                .orElseThrow(() -> new RideNotFoundException(promoCodeApplyRequest.getRideId()));
+        if (ride.getIsPromoCodeApplied()) {
             throw new PromoCodeAlreadyAppliedException(promoCodeApplyRequest.getPromoCode());
         }
+        PromoCodeResponse promoCodeResponse = applyPromoCode(promoCodeApplyRequest)
+                .orElseThrow(() -> new PromoCodeAlreadyAppliedException(promoCodeApplyRequest.getPromoCode()));
 
-        PromoCodeResponse promoCodeResponse = promoCodeServiceWebClient.post()
-                                            .uri(uriBuilder -> uriBuilder.path("/apply/{name}")
-                                                    .build(promoCodeApplyRequest.getPromoCode()))
-                                            .contentType(MediaType.APPLICATION_JSON)
-                                            .bodyValue(BodyInserters.fromValue(promoCodeApplyRequest))
-                                            .retrieve()
-                                            .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle4xxError)
-                                            .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle5xxError)
-                                            .bodyToMono(PromoCodeResponse.class)
-                                            .block();
-        if(promoCodeResponse == null) {
-            throw new PromoCodeAlreadyAppliedException(promoCodeApplyRequest.getPromoCode());
-        }
         ride.setIsPromoCodeApplied(true);
         BigDecimal newPriceForRide = ride.getCost()
                 .subtract(ride.getCost().multiply(BigDecimal.valueOf(promoCodeResponse.discount()))
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
         ride.setCost(newPriceForRide);
 
         return RideMapper.MAPPER_INSTANCE.mapToRideResponse(rideRepository.save(ride));
+    }
+
+    private Optional<PromoCodeResponse> applyPromoCode(PromoCodeApplyRequest promoCodeApplyRequest) {
+        return Optional.ofNullable(promoCodeServiceWebClient.post()
+                .uri(uriBuilder -> uriBuilder.path("/apply/{name}")
+                        .build(promoCodeApplyRequest.getPromoCode()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(BodyInserters.fromValue(promoCodeApplyRequest))
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle4xxError)
+                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle5xxError)
+                .bodyToMono(PromoCodeResponse.class)
+                .block());
+    }
+
+    private void makeCharge(PaymentRequest paymentRequest) {
+        paymentServiceWebClient.post()
+                .uri(uriBuilder -> uriBuilder.path("/charge")
+                        .build())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(paymentRequest))
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle4xxError)
+                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle5xxError)
+                .bodyToMono(PaymentResponse.class)
+                .block();
     }
 
     private Ride getRideByChangeRideStatusRequest(ChangeRideStatusRequest changeRideStatusRequest) {
         return rideRepository.findByIdAndDriverId(
                 changeRideStatusRequest.getRideId(),
                 changeRideStatusRequest.getDriverId()
-        ).orElseThrow(()->new RideNotFoundException(changeRideStatusRequest.getRideId()));
+        ).orElseThrow(() -> new RideNotFoundException(changeRideStatusRequest.getRideId()));
     }
 
     private void validatePassenger(Long passengerId) {
@@ -246,7 +246,7 @@ public class RideServiceImpl implements RideService {
                 .block();
 
         paymentServiceWebClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/card/give-default")
+                .uri(uriBuilder -> uriBuilder.path("/card/default")
                         .queryParam("userId", passengerId)
                         .queryParam("userRole", UserRole.PASSENGER.name())
                         .build())

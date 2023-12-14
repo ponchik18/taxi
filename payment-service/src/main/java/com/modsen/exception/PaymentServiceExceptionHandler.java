@@ -29,7 +29,7 @@ public class PaymentServiceExceptionHandler {
     }
 
     @ExceptionHandler({CreditCardNotFoundException.class,
-            DriverBalanceNotFound.class, UserNotFoundException.class,
+            DriverBalanceNotFound.class, StripeCustomerNotFoundException.class,
             DefaultCreditCardNotFoundException.class, UserRoleNotFoundException.class, NoHandlerFoundException.class,
             EntityNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -41,7 +41,7 @@ public class PaymentServiceExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler({NotRightAmountForPayout.class, PayoutNotProcessedException.class,  })
+    @ExceptionHandler({NotEnoughMoneyForPayoutException.class, PayoutNotProcessedException.class,  })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessageResponse handleServerErrorException(Exception exception) {
         return ErrorMessageResponse.builder()

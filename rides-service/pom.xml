@@ -81,7 +81,7 @@
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
-                <version>4.23.0</version> <!-- Use the latest version -->
+                <version>${liquebase.maven.plugin.version}</version> <!-- Use the latest version -->
                 <executions>
                     <execution>
                         <goals>
@@ -89,6 +89,7 @@
                         </goals>
                     </execution>
                 </executions>
+
                 <configuration>
                     <propertyFile>src/main/resources/liquibase.properties</propertyFile>
                 </configuration>

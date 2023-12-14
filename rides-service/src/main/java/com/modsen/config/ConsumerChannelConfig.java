@@ -1,5 +1,6 @@
 package com.modsen.config;
 
+import com.modsen.constants.RidesServiceConstants;
 import com.modsen.dto.rides.RideResponseWithDriver;
 import com.modsen.handler.RideResponseWithDriverHandler;
 import lombok.RequiredArgsConstructor;
@@ -73,8 +74,14 @@ public class ConsumerChannelConfig {
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, springIntegrationKafkaGroupId);
 
-        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        properties.put("spring.json.trusted.packages", "com.modsen.dto.rides");
+        properties.put(
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+                RidesServiceConstants.KafkaProperties.AUTO_OFFSET_RESET_CONFIG_VALUE
+        );
+        properties.put(
+                RidesServiceConstants.KafkaProperties.TRUSTED_PACKAGE_KEY,
+                RidesServiceConstants.KafkaProperties.TRUSTED_PACKAGE_VALUE
+        );
         return properties;
     }
 }

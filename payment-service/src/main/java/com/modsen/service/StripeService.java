@@ -14,5 +14,10 @@ public interface StripeService {
 
     Customer getCustomer(String customerId, String email);
 
-    void addSourceToCustomer(Customer customer, Token token) throws StripeException;
+    String createCardForCustomer(String customer, Token token) throws StripeException;
+    String getDefaultCardIdForCustomer(String customerId) throws StripeException;
+
+    void makeCreditCardDefault(String customerId, String stripeCardId) throws StripeException;
+
+    void deleteCard(String customerId, String cardId) throws StripeException;
 }

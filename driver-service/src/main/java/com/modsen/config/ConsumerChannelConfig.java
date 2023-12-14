@@ -1,5 +1,6 @@
 package com.modsen.config;
 
+import com.modsen.constants.DriverServiceConstants;
 import com.modsen.dto.rides.RideDriverRequest;
 import com.modsen.handler.RideDriverRequestHandler;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,8 @@ public class ConsumerChannelConfig {
 
     @Bean
     public KafkaMessageDrivenChannelAdapter<String, RideDriverRequest> kafkaMessageDrivenChannelAdapter() {
-        KafkaMessageDrivenChannelAdapter<String, RideDriverRequest> kafkaMessageDrivenChannelAdapter = new KafkaMessageDrivenChannelAdapter<>(kafkaListenerContainer());
+        KafkaMessageDrivenChannelAdapter<String, RideDriverRequest> kafkaMessageDrivenChannelAdapter =
+                new KafkaMessageDrivenChannelAdapter<>(kafkaListenerContainer());
         kafkaMessageDrivenChannelAdapter.setOutputChannel(consumerChannel());
 
         return kafkaMessageDrivenChannelAdapter;
@@ -72,9 +74,14 @@ public class ConsumerChannelConfig {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, springIntegrationKafkaGroupId);
-        // automatically reset the offset to the earliest offset
-        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        properties.put("spring.json.trusted.packages", "com.modsen.dto.rating, com.modsen.dto.card, com.modsen.dto.promo,com.modsen.dto.rides,com.modsen.dto.payment");
+        properties.put(
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+                DriverServiceConstants.KafkaProperties.AUTO_OFFSET_RESET_CONFIG_VALUE
+        );
+        properties.put(
+                DriverServiceConstants.KafkaProperties.TRUSTED_PACKAGE_KEY,
+                DriverServiceConstants.KafkaProperties.TRUSTED_PACKAGE_VALUE
+        );
         return properties;
     }
 }

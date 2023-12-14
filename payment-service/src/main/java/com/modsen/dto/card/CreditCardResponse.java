@@ -8,9 +8,8 @@ public record CreditCardResponse(
         Long id,
         String cardNumber,
         String cardHolder,
-        String customerId,
         UserRole userRole,
         Long userId,
-        String token
+        String stripeCardId
 ) {
 }

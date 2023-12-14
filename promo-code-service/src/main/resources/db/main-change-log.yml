@@ -1,3 +1,5 @@
 databaseChangeLog:
-  - include:
+  - # Start of include for table-promo-code-change-log.yml
+    include:
       file: db/versions/table-promo-code-change-log.yml
+  - # End of include for table-promo-code-change-log.yml

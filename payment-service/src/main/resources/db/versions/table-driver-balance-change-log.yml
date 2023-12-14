@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-rating-table
+      id: create-driver-balance-table
       author: ponchik18
       changes:
         - createTable:
-            tableName: rating
+            tableName: driver_balance
             columns:
               - column:
                   name: id
@@ -13,17 +13,11 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: entity_id
+                  name: driver_id
                   type: bigint
               - column:
-                  name: mark
-                  type: int
-              - column:
-                  name: user_role
-                  type: VARCHAR(255)
-              - column:
-                  name: ride_id
-                  type: bigint
+                  name: amount
+                  type: DECIMAL
       rollback:
         - dropTable:
-            tableName: rating
+            tableName: driver_balance

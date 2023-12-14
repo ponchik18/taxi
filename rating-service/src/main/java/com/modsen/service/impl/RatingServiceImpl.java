@@ -30,12 +30,9 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public RatingListResponse getAllRatingByEntityId(Long entityId, String userRole) {
-        List<Rating> ratingList;
-        if(Objects.nonNull(entityId) || Objects.nonNull(userRole)) {
-            ratingList = ratingRepository.findAllByEntityIdAndUserRole(entityId, UserRoleMapper.mapToUserRole(userRole));
-        } else {
-            ratingList = ratingRepository.findAll();
-        }
+        List<Rating> ratingList = Objects.nonNull(entityId) || Objects.nonNull(userRole)
+                ? ratingRepository.findAllByEntityIdAndUserRole(entityId, UserRoleMapper.mapToUserRole(userRole))
+                : ratingRepository.findAll();
 
         Double totalMark = ratingList.stream()
                 .mapToDouble(Rating::getMark)
@@ -66,7 +63,7 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public void deleteRating(long id) {
-        if(!ratingRepository.existsById(id)) {
+        if (!ratingRepository.existsById(id)) {
             throw new RatingNotFoundException(id);
         }
 
@@ -75,7 +72,7 @@ public class RatingServiceImpl implements RatingService {
 
     private void validateRatingRequest(RatingRequest ratingRequest) {
         UserRole userRole = UserRoleMapper.mapToUserRole(ratingRequest.getUserRole());
-        if(ratingRepository.existsByEntityIdAndUserRoleAndRideId(ratingRequest.getEntityId(), userRole, ratingRequest.getRideId())) {
+        if (ratingRepository.existsByEntityIdAndUserRoleAndRideId(ratingRequest.getEntityId(), userRole, ratingRequest.getRideId())) {
             throw new RatingAlreadyExistsException(ratingRequest.getRideId(), userRole);
         }
         validateRide(ratingRequest.getRideId());

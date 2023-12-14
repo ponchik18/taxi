@@ -1,13 +1,12 @@
 package com.modsen.contoller;
 
 import com.modsen.constants.RidesServiceConstants;
-import com.modsen.dto.rating.RatingRequest;
+import com.modsen.dto.promo.PromoCodeApplyRequest;
 import com.modsen.dto.rides.ChangeRideStatusRequest;
 import com.modsen.dto.rides.RideDriverRequest;
 import com.modsen.dto.rides.RideListResponse;
 import com.modsen.dto.rides.RidePassengerRequest;
 import com.modsen.dto.rides.RideResponse;
-import com.modsen.dto.promo.PromoCodeApplyRequest;
 import com.modsen.model.PageSetting;
 import com.modsen.service.RideService;
 import jakarta.validation.Valid;
@@ -60,13 +59,13 @@ public class RideController {
         rideService.deleteRide(id);
     }
 
-    @PutMapping("/finish-ride")
+    @PutMapping("/finish")
     @ResponseStatus(HttpStatus.OK)
     public RideResponse finishRide(@Valid @RequestBody ChangeRideStatusRequest changeRideStatusRequest) {
         return rideService.finishRide(changeRideStatusRequest);
     }
 
-    @PutMapping("/cancel-ride")
+    @PutMapping("/ride")
     @ResponseStatus(HttpStatus.OK)
     public RideResponse cancelRide(@Valid @RequestBody ChangeRideStatusRequest changeRideStatusRequest) {
         return rideService.cancelRide(changeRideStatusRequest);
@@ -78,13 +77,7 @@ public class RideController {
         return rideService.confirmDriverArrival(changeRideStatusRequest);
     }
 
-    @PostMapping("/create-rating")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createRatingForRide(@Valid @RequestBody RatingRequest ratingRequest) {
-        rideService.createRating(ratingRequest);
-    }
-
-    @PutMapping("/apply-promo-code")
+    @PutMapping("/promo-code")
     @ResponseStatus(HttpStatus.OK)
     public RideResponse applyPromoCode(@Valid @RequestBody PromoCodeApplyRequest promoCodeApplyRequest) {
         return rideService.applyApplyCode(promoCodeApplyRequest);

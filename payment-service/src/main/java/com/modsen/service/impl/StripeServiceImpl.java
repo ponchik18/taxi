@@ -5,15 +5,13 @@ import com.modsen.exception.CreditCardNotAddException;
 import com.modsen.exception.RideNotPaidException;
 import com.modsen.service.StripeService;
 import com.stripe.Stripe;
-import com.stripe.exception.APIConnectionException;
-import com.stripe.exception.APIException;
-import com.stripe.exception.AuthenticationException;
-import com.stripe.exception.CardException;
-import com.stripe.exception.InvalidRequestException;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Card;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
 import com.stripe.model.Token;
+import com.stripe.param.CustomerRetrieveParams;
+import com.stripe.param.CustomerUpdateParams;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -69,21 +66,41 @@ public class StripeServiceImpl implements StripeService {
 
     @Override
     public Customer getCustomer(String customerId, String email) {
-        Customer customer = getCustomer(customerId);
-        if (Objects.isNull(customer)) {
-            customer = createCustomer(email);
+        try {
+            return Customer.retrieve(customerId);
+        } catch (Exception e) {
+            return createCustomer(email);
         }
-        return customer;
     }
 
     @Override
-    public void addSourceToCustomer(Customer customer, Token token) throws StripeException {
-        customer.update(Map.of("source", token.getId()));
+    public String createCardForCustomer(String customerId, Token token) throws StripeException {
+        Customer customer = getCustomer(customerId);
+        String stripeCardId = customer.getSources()
+                .create(Map.of("card", token.getId()))
+                .getId();
+        updateDefaultCard(stripeCardId, customer);
+        return stripeCardId;
     }
 
     @Override
-    public Token getTokenById(String id) throws APIConnectionException, APIException, AuthenticationException, InvalidRequestException, CardException {
-        return Token.retrieve(id);
+    public String getDefaultCardIdForCustomer(String customerId) throws StripeException {
+        Customer customer = Customer.retrieve(customerId);
+        return customer.getDefaultSource();
+    }
+
+    @Override
+    public void makeCreditCardDefault(String customerId, String stripeCardId) throws StripeException {
+        Customer customer = getCustomer(customerId);
+        updateDefaultCard(stripeCardId, customer);
+    }
+
+    @Override
+    public void deleteCard(String customerId, String cardId) throws StripeException {
+        Customer customer = getCustomer(customerId);
+        Card card = (Card) customer.getSources()
+                .retrieve(cardId);
+        card.delete();
     }
 
     private Customer createCustomer(String email) {
@@ -96,13 +113,21 @@ public class StripeServiceImpl implements StripeService {
         }
     }
 
-    private Customer getCustomer(String customerId) {
-        try {
-            return Customer.retrieve(customerId);
-        } catch (Exception e) {
-            return null;
-        }
+    private Customer getCustomer(String customerId) throws StripeException {
+        CustomerRetrieveParams params = CustomerRetrieveParams.builder()
+                .addExpand("sources")
+                .build();
+        return Customer.retrieve(customerId, params, null);
     }
 
-
+    private void updateDefaultCard(String cardId, Customer customer) throws StripeException {
+        CustomerUpdateParams customerUpdateParams = new CustomerUpdateParams.Builder()
+                .setInvoiceSettings(
+                        CustomerUpdateParams.InvoiceSettings.builder()
+                                .setDefaultPaymentMethod(cardId)
+                                .build()
+                )
+                .build();
+        customer.update(customerUpdateParams);
+    }
 }

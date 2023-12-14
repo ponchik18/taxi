@@ -8,21 +8,18 @@ import com.modsen.dto.payment.PaymentResponse;
 import com.modsen.dto.payment.PayoutRequest;
 import com.modsen.dto.payment.PayoutResponse;
 import com.modsen.enums.UserRole;
-import com.modsen.exception.CreditCardNotFoundException;
-import com.modsen.exception.DefaultCreditCardNotFoundException;
 import com.modsen.exception.DriverBalanceNotFound;
-import com.modsen.exception.NotRightAmountForPayout;
+import com.modsen.exception.NotEnoughMoneyForPayoutException;
+import com.modsen.exception.StripeCustomerNotFoundException;
 import com.modsen.mapper.DriverBalanceMapper;
 import com.modsen.mapper.PaymentMapper;
-import com.modsen.model.CreditCard;
-import com.modsen.model.DefaultCreditCard;
 import com.modsen.model.DriverBalance;
 import com.modsen.model.PageSetting;
 import com.modsen.model.Payment;
-import com.modsen.repository.CreditCardRepository;
-import com.modsen.repository.DefaultCreditCardRepository;
+import com.modsen.model.StripeCustomer;
 import com.modsen.repository.DriverBalanceRepository;
 import com.modsen.repository.PaymentRepository;
+import com.modsen.repository.StripeCustomerRepository;
 import com.modsen.service.PaymentService;
 import com.modsen.service.StripeService;
 import com.modsen.service.feigh.DriverServiceClient;
@@ -44,16 +41,15 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final DriverBalanceRepository driverBalanceRepository;
     private final StripeService stripeService;
-    private final CreditCardRepository creditCardRepository;
-    private final DefaultCreditCardRepository defaultCreditCardRepository;
     private final PassengerServiceClient passengerServiceClient;
     private final DriverServiceClient driverServiceClient;
+    private final StripeCustomerRepository stripeCustomerRepository;
 
     @Override
     @Transactional
     public PaymentResponse charge(PaymentRequest paymentRequest) {
         validatePassenger(paymentRequest.getPassengerId());
-        CreditCard creditCard = getDefaultCreditCardForPassenger(paymentRequest.getPassengerId());
+        String customerId = getDefaultCreditCardForPassenger(paymentRequest.getPassengerId());
 
         Payment newPayment = PaymentMapper.MAPPER_INSTANCE.mapToPayment(paymentRequest);
         newPayment.setPaymentDate(LocalDateTime.now());
@@ -61,10 +57,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         DriverBalance driverBalance = driverBalanceRepository.findByDriverId(paymentRequest.getDriverId())
                 .orElse(
-                    DriverBalance.builder()
-                            .driverId(paymentRequest.getDriverId())
-                            .amount(BigDecimal.ZERO)
-                            .build()
+                        DriverBalance.builder()
+                                .driverId(paymentRequest.getDriverId())
+                                .amount(BigDecimal.ZERO)
+                                .build()
                 );
         BigDecimal driverAmount = paymentRequest.getAmount()
                 .multiply(PaymentServiceConstants.DefaultValue.DRIVE_PERCENTAGE_OF_THE_RIDE)
@@ -74,7 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
                         .add(driverAmount)
         );
 
-        stripeService.charge(creditCard.getCustomerId(), paymentRequest.getAmount());
+        stripeService.charge(customerId, paymentRequest.getAmount());
 
         driverBalanceRepository.save(driverBalance);
         return PaymentMapper.MAPPER_INSTANCE.mapToPaymentResponse(
@@ -82,13 +78,12 @@ public class PaymentServiceImpl implements PaymentService {
         );
     }
 
-    private CreditCard getDefaultCreditCardForPassenger(Long userId) {
+    private String getDefaultCreditCardForPassenger(Long userId) {
         validatePassenger(userId);
-        DefaultCreditCard defaultCreditCard = defaultCreditCardRepository.findByUserIdAndUserRole(userId, UserRole.PASSENGER)
-                .orElseThrow(()->new DefaultCreditCardNotFoundException(UserRole.PASSENGER.name(),userId));
+        StripeCustomer stripeCustomer = stripeCustomerRepository.findByUserIdAndUserRole(userId, UserRole.PASSENGER)
+                .orElseThrow(() -> new StripeCustomerNotFoundException(userId, UserRole.PASSENGER.name()));
 
-        return creditCardRepository.findById(defaultCreditCard.getCardId())
-                .orElseThrow(()->new CreditCardNotFoundException(defaultCreditCard.getCardId()));
+        return stripeCustomer.getCustomerId();
     }
 
     @Override
@@ -96,7 +91,7 @@ public class PaymentServiceImpl implements PaymentService {
         Pageable pageable = PageRequestFactory.buildPageRequest(pageSetting);
         List<Payment> paymentList = paymentRepository.findAll(pageable)
                 .toList();
-        List<PaymentResponse> paymentResponseList= PaymentMapper.MAPPER_INSTANCE.mapToListOfPaymentResponse(paymentList);
+        List<PaymentResponse> paymentResponseList = PaymentMapper.MAPPER_INSTANCE.mapToListOfPaymentResponse(paymentList);
         return PaymentListResponse.builder()
                 .payments(paymentResponseList)
                 .totalCountOfPayment(paymentResponseList.size())
@@ -108,10 +103,10 @@ public class PaymentServiceImpl implements PaymentService {
     public PayoutResponse payout(PayoutRequest payoutRequest) {
         validateDriver(payoutRequest.getDriverId());
         DriverBalance driverBalance = driverBalanceRepository.findByDriverId(payoutRequest.getDriverId())
-                .orElseThrow(()->new DriverBalanceNotFound(payoutRequest.getDriverId()));
+                .orElseThrow(() -> new DriverBalanceNotFound(payoutRequest.getDriverId()));
         BigDecimal actualBalance = driverBalance.getAmount();
-        if(actualBalance.compareTo(payoutRequest.getAmount())<0){
-            throw new NotRightAmountForPayout(actualBalance, payoutRequest.getAmount());
+        if (actualBalance.compareTo(payoutRequest.getAmount()) < 0) {
+            throw new NotEnoughMoneyForPayoutException(actualBalance, payoutRequest.getAmount());
         }
 
         driverBalance.setAmount(actualBalance.subtract(payoutRequest.getAmount()));
@@ -128,7 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
     public DriverBalanceResponse getDriverBalance(long driverId) {
         validateDriver(driverId);
         DriverBalance driverBalance = driverBalanceRepository.findByDriverId(driverId)
-                .orElseThrow(()->new DriverBalanceNotFound(driverId));
+                .orElseThrow(() -> new DriverBalanceNotFound(driverId));
         return DriverBalanceMapper.MAPPER_INSTANCE.mapToDriverBalanceResponse(driverBalance);
     }
 

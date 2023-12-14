@@ -1,3 +1,9 @@
 databaseChangeLog:
-  - include:
+  - # Start of include for table-rides-change-log.yml
+    include:
       file: db/versions/table-rides-change-log.yml
+  - # End of include for table-rides-change-log.yml
+  - # Start of include for add-column-is-promo-code-apply-change-log.yml
+    include:
+      file: db/versions/add-column-is-promo-code-apply-change-log.yml
+  - # End of include for add-column-is-promo-code-apply-change-log.yml

@@ -1,7 +1,9 @@
 package com.modsen.exception;
 
+import com.modsen.constants.PaymentServiceConstants;
+
 public class PayoutNotProcessedException extends RuntimeException {
     public PayoutNotProcessedException() {
-        super("Payout not processed!");
+        super(PaymentServiceConstants.Errors.Message.PAYOUT_NOT_PROCESS);
     }
 }

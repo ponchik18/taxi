@@ -24,6 +24,11 @@ spring:
       sent-topic: create-ride
       accepted-topic: save-ride
       group_id: rides-service
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+    producer:
+      change-driver-status-topic: change-driver-status
 
 eureka:
   client:

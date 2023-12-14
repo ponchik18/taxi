@@ -18,5 +18,11 @@ public interface RatingServiceConstants {
     }
     interface Path {
         String RATING_CONTROLLER_PATH = "/api/v1/rating";
+        String DRIVER_SERVICE_NAME = "driver-service";
+        String DRIVER_SERVICE_PATH = "/api/v1/driver";
+        String PASSENGER_SERVICE_NAME = "passenger-service";
+        String PASSENGER_SERVICE_PATH = "/api/v1/passenger";
+        String RIDES_SERVICE_NAME = "rides-service";
+        String RIDES_SERVICE_PATH = "/api/v1/rides";
     }
 }

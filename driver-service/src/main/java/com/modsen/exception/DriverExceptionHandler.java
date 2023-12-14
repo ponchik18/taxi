@@ -16,7 +16,6 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class DriverExceptionHandler {
-
     @ExceptionHandler({DriverNotFoundException.class, NoHandlerFoundException.class, DriverStatusNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorMessageResponse handleNotFoundException(DriverNotFoundException exception) {

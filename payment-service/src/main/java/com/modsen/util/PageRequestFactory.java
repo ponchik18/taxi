@@ -14,13 +14,13 @@ public class PageRequestFactory {
     }
 
     private static Sort buildSort(PageSetting pageSetting) {
-        if(Objects.isNull(pageSetting.getSortField())) {
+        if (Objects.isNull(pageSetting.getSortField())) {
             return Sort.unsorted();
         }
 
         Sort sort = Sort.by(pageSetting.getSortField());
 
-        if(pageSetting.getDirection().equals(PaymentServiceConstants.DefaultValue.SORT_ASC)) {
+        if (pageSetting.getDirection().equals(PaymentServiceConstants.DefaultValue.SORT_ASC)) {
             return sort.ascending();
         }
         return sort.descending();

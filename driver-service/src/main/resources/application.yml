@@ -20,8 +20,9 @@ spring:
     change-log: classpath:db/main-change-log.yml
   kafka:
     consumer:
+      topic: change-driver-status
       bootstrap-servers: localhost:9092
-      group-id: cancel-ride
+      group-id: change-driver-status-listener
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       auto-offset-reset: earliest

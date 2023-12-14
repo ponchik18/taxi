@@ -1,5 +1,6 @@
 package com.modsen.config;
 
+import com.modsen.constants.DriverServiceConstants;
 import com.modsen.dto.rides.RideResponseWithDriver;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -32,8 +33,11 @@ public class ProducerChannelConfig {
     @Bean
     @ServiceActivator(inputChannel = "producingChannel")
     public MessageHandler kafkaMessageHandler() {
-        KafkaProducerMessageHandler<String, RideResponseWithDriver> handler = new KafkaProducerMessageHandler<>(kafkaTemplateRideResponseWithDriver());
-        handler.setMessageKeyExpression(new LiteralExpression("kafka-integration"));
+        KafkaProducerMessageHandler<String, RideResponseWithDriver> handler =
+                new KafkaProducerMessageHandler<>(kafkaTemplateRideResponseWithDriver());
+        handler.setMessageKeyExpression(
+                new LiteralExpression(DriverServiceConstants.KafkaProperties.MESSAGE_KEY_EXPRESSION)
+        );
 
         return handler;
     }
@@ -54,8 +58,11 @@ public class ProducerChannelConfig {
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        properties.put(ProducerConfig.LINGER_MS_CONFIG, 1);
-        properties.put("spring.json.trusted.packages", "com.modsen.dto.rides");
+        properties.put(ProducerConfig.LINGER_MS_CONFIG, DriverServiceConstants.KafkaProperties.LINGER_MS_CONFIG_VALUE);
+        properties.put(
+                DriverServiceConstants.KafkaProperties.TRUSTED_PACKAGE_KEY,
+                DriverServiceConstants.KafkaProperties.TRUSTED_PACKAGE_VALUE
+        );
         return properties;
     }
 

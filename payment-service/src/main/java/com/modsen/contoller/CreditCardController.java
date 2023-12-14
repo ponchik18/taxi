@@ -38,27 +38,27 @@ public class CreditCardController {
         return creditCardService.getAllUserCreditCard(userId, userRole);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CreditCardResponse getCreditCardById(@PathVariable long id) {
         return creditCardService.getCreditCardById(id);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{cardId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCreditCard(@PathVariable long id) {
-        creditCardService.deleteCreditCard(id);
+    public void deleteCreditCard(@PathVariable long cardId, @RequestParam long userId, @RequestParam String userRole) {
+        creditCardService.deleteCreditCard(cardId, userId, userRole);
     }
 
-    @PutMapping("/make-default")
+    @PutMapping("/default")
     @ResponseStatus(HttpStatus.OK)
     public CreditCardResponse makeCreditCardDefault(@Valid @RequestBody DefaultCreditCardRequest defaultCreditCardRequest) {
         return creditCardService.makeCreditCardDefault(defaultCreditCardRequest);
     }
 
-    @GetMapping("/give-default")
+    @GetMapping("/default")
     @ResponseStatus(HttpStatus.OK)
-    public CreditCardResponse gaveDefaultCardForUser(@RequestParam long userId, @RequestParam String userRole) {
+    public CreditCardResponse getDefaultCardForUser(@RequestParam long userId, @RequestParam String userRole) {
         return creditCardService.getDefaultCardForUser(userId, userRole);
     }
 }

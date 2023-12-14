@@ -7,7 +7,7 @@ import java.util.List;
 @Builder
 public record DriverListResponse(
         List<DriverResponse> drivers,
-        int totalDriversCount
+        int driverCount
 
 ) {
 }

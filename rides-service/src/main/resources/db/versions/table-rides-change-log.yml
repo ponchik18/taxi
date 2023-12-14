@@ -40,14 +40,3 @@ databaseChangeLog:
       rollback:
         - dropTable:
             tableName: driver
-  - changeSet:
-      id: add-new-column-is-promo-code-applied-for-rides
-      author: ponchik18
-      changes:
-        - addColumn:
-            tableName: ride
-            columns:
-              - column:
-                  name: is_promo_code_applied
-                  type: BOOLEAN
-                  defaultValueBoolean: false
