@@ -3,22 +3,36 @@ server:
 spring:
   application:
     name: rides-service
-#  datasource:
-#    password: password
-#    url: jdbc:postgresql://localhost:5432/passenger
-#    username: ponchik18
+  datasource:
+    password: password
+    url: jdbc:postgresql://localhost:5432/rides
+    username: ponchik18
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-#  liquibase:
-#    enabled: true
-#    change-log: classpath:db/main-change-log.yml
+  liquibase:
+    enabled: true
+    change-log: classpath:db/main-change-log.yml
+  integration:
+    kafka:
+      bootstrap-servers: localhost:9092
+      sent-topic: create-ride
+      accepted-topic: save-ride
+      group_id: rides-service
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+    producer:
+      change-driver-status-topic: change-driver-status
+
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8000/eureka
+    fetch-registry: true
+    register-with-eureka: true

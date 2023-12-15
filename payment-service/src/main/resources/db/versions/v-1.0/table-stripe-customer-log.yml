@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-stripe_customer-table
+      author: ponchik18
+      changes:
+        - createTable:
+            tableName: stripe_customer
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: bigint
+              - column:
+                  name: customer_id
+                  type: VARCHAR(255)
+              - column:
+                  name: user_role
+                  type: VARCHAR(255)
+      rollback:
+        - dropTable:
+            tableName: customers_id

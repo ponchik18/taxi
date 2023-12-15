@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-rating-table
+      author: ponchik18
+      changes:
+        - createTable:
+            tableName: rating
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: entity_id
+                  type: bigint
+              - column:
+                  name: mark
+                  type: int
+              - column:
+                  name: user_role
+                  type: VARCHAR(255)
+              - column:
+                  name: ride_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: rating

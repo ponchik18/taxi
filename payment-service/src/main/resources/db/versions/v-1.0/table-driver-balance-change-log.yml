@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-driver-balance-table
+      author: ponchik18
+      changes:
+        - createTable:
+            tableName: driver_balance
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: driver_id
+                  type: bigint
+              - column:
+                  name: amount
+                  type: DECIMAL
+      rollback:
+        - dropTable:
+            tableName: driver_balance

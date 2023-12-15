@@ -1,9 +1,9 @@
 package com.modsen.service.impl;
 
 import com.modsen.constants.PassengerServiceConstants;
-import com.modsen.dto.PassengerListResponse;
-import com.modsen.dto.PassengerRequest;
-import com.modsen.dto.PassengerResponse;
+import com.modsen.dto.passenger.PassengerListResponse;
+import com.modsen.dto.passenger.PassengerRequest;
+import com.modsen.dto.passenger.PassengerResponse;
 import com.modsen.exception.PassengerNotFoundException;
 import com.modsen.mapper.PassengerMapper;
 import com.modsen.model.PageSetting;
@@ -33,7 +33,7 @@ public class PassengerServiceImpl implements PassengerService {
 
         return PassengerListResponse.builder()
                 .passengers(passengerResponses)
-                .totalPassengerCount(passengerResponses.size())
+                .passengerCount(passengerResponses.size())
                 .build();
     }
 
@@ -58,46 +58,59 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     public PassengerResponse updatePassenger(long id, PassengerRequest passengerRequest) {
-        if(!passengerRepository.existsById(id)){
-            throw new PassengerNotFoundException(id);
-        }
+        Passenger passenger = passengerRepository.findById(id)
+                .orElseThrow(() -> new PassengerNotFoundException(id));
+        validatePassengerUpdateRequest(passengerRequest, passenger);
 
-        validatePassengerRequest(passengerRequest);
         Passenger updatedPassenger = PassengerMapper.MAPPER_INSTANCE.mapToPassenger(passengerRequest);
         updatedPassenger.setId(id);
 
         return PassengerMapper.MAPPER_INSTANCE.mapToPassengerResponse(
-                    passengerRepository.save(updatedPassenger)
+                passengerRepository.save(updatedPassenger)
         );
     }
 
-    private void validatePassengerRequest(PassengerRequest passengerRequest) {
-        if(passengerRepository.existsByEmail(passengerRequest.getEmail())) {
-            throw new DuplicateKeyException(
-                    String.format(
-                            PassengerServiceConstants.Errors.Message.DUPLICATE_USER_WITH_EMAIL,
-                            passengerRequest.getEmail()
-                    )
-            );
-        }
-
-        if(passengerRepository.existsByPhone(passengerRequest.getPhone())) {
-            throw new DuplicateKeyException(
-                    String.format(
-                            PassengerServiceConstants.Errors.Message.DUPLICATE_USER_WITH_PHONE,
-                            passengerRequest.getPhone()
-                    )
-            );
-        }
-    }
-
+    @Override
     public void deletePassenger(long id) {
-        if(passengerRepository.existsById(id)) {
-            passengerRepository.deleteById(id);
-        } else {
+        if (!passengerRepository.existsById(id)) {
             throw new PassengerNotFoundException(id);
         }
+
+        passengerRepository.deleteById(id);
     }
 
+    private void validatePassengerUpdateRequest(PassengerRequest passengerRequest, Passenger passenger) {
+        if (!passenger.getEmail().equals(passengerRequest.getEmail())) {
+            validatePassengerRequestByEmail(passengerRequest);
+        }
+        if (!passenger.getPhone().equals(passengerRequest.getPhone())) {
+            validatePassengerRequestByPhone(passengerRequest);
+        }
+    }
 
+    private void validatePassengerRequest(PassengerRequest passengerRequest) {
+        validatePassengerRequestByEmail(passengerRequest);
+
+        validatePassengerRequestByPhone(passengerRequest);
+    }
+
+    private void validatePassengerRequestByPhone(PassengerRequest passengerRequest) {
+        if (passengerRepository.existsByPhone(passengerRequest.getPhone())) {
+            String error = String.format(
+                    PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE,
+                    passengerRequest.getPhone()
+            );
+            throw new DuplicateKeyException(error);
+        }
+    }
+
+    private void validatePassengerRequestByEmail(PassengerRequest passengerRequest) {
+        if (passengerRepository.existsByEmail(passengerRequest.getEmail())) {
+            String error = String.format(
+                    PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL,
+                    passengerRequest.getEmail()
+            );
+            throw new DuplicateKeyException(error);
+        }
+    }
 }

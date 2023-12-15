@@ -7,7 +7,7 @@ import lombok.Getter;
 public class PassengerNotFoundException extends RuntimeException {
     private final long userId;
     public PassengerNotFoundException(long id) {
-        super(String.format(PassengerServiceConstants.Errors.Message.USER_NOT_FOUND, id));
+        super(String.format(PassengerServiceConstants.Errors.Message.PASSENGER_NOT_FOUND, id));
         this.userId = id;
     }
 }

@@ -1,4 +1,4 @@
-package com.modsen.dto;
+package com.modsen.dto.passenger;
 
 import lombok.Builder;
 
@@ -9,5 +9,4 @@ public record PassengerResponse(
         String lastName,
         String email,
         String phone
-) {
-}
+) { }

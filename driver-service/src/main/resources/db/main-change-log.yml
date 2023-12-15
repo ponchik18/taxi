@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: driver-service-db-init
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: db-init
+  - include:
+      file: db/versions/v-1.0/table-driver-change-log.yml
+  - changeSet:
+      id: driver-service-create-tables
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: v-1.0

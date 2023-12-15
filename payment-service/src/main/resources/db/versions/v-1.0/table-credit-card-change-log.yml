@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-credit-card-table
+      author: ponchik18
+      changes:
+        - createTable:
+            tableName: credit_card
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: card_number
+                  type: VARCHAR(255)
+              - column:
+                  name: card_holder
+                  type: VARCHAR(255)
+              - column:
+                  name: user_role
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: bigint
+              - column:
+                  name: stripe_card_id
+                  type: VARCHAR(255)
+      rollback:
+        - dropTable:
+            tableName: credit_card

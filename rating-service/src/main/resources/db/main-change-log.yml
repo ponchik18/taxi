@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: rating-service-db-init
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: db-init
+  - include:
+      file: db/versions/v-1.0/table-rating-change-log.yml
+  - changeSet:
+      id: rating-service-create-tables
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: v-1.0

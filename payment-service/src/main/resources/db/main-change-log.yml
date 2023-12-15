@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: payment-service-db-init
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: db-init
+  - include:
+      file: db/versions/v-1.0/db.changelog-v.1.0.yml
+  - changeSet:
+      id: payment-service-create-tables
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: v-1.0

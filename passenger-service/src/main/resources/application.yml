@@ -1,5 +1,11 @@
 server:
   port: 8001
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka
+    fetch-registry: true
+    register-with-eureka: true
 spring:
   application:
     name: passenger-service
@@ -18,7 +24,15 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/main-change-log.yml
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8000/eureka
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "com.modsen.dto.rating, com.modsen.dto.card, com.modsen.dto.promo,com.modsen.dto.rides"
+    admin:
+      auto-create: true

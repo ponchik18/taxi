@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-payment-table
+      author: ponchik18
+      changes:
+        - createTable:
+            tableName: payment
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: amount
+                  type: decimal
+              - column:
+                  name: payment_date
+                  type: DATETIME
+              - column:
+                  name: ride_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: payment

@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-rides-table
+      author: ponchik18
+      changes:
+        - createTable:
+            tableName: ride
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: passenger_id
+                  type: bigint
+              - column:
+                  name: driver_id
+                  type: bigint
+              - column:
+                  name: pick_up_location
+                  type: VARCHAR(255)
+              - column:
+                  name: drop_location
+                  type: VARCHAR(255)
+              - column:
+                  name: start_time
+                  type: DATETIME
+              - column:
+                  name: end_time
+                  type: DATETIME
+              - column:
+                  name: cost
+                  type: decimal
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+
+      rollback:
+        - dropTable:
+            tableName: driver

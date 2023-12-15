@@ -70,7 +70,7 @@ public class PassengerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessageResponse handle(Exception exception) {
         return ErrorMessageResponse.builder()
-                .statusCode(HttpStatus.NOT_FOUND.value())
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .timestamp(new Date())
                 .message(exception.getMessage())
                 .build();

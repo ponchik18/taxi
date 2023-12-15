@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: rides-service-db-init
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: db-init
+  - include:
+      file: db/versions/v-1.0/table-promo-code-change-log.yml
+  - changeSet:
+      id: rides-service-create-tables
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: v-1.0
+  - include:
+      file: db/versions/v-2.0/add-column-is-promo-code-apply-change-log.yml
+  - changeSet:
+      id: rides-service-create-tables
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: v-2.0
