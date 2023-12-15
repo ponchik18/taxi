@@ -71,7 +71,7 @@ public class RideController {
         return rideService.cancelRide(changeRideStatusRequest);
     }
 
-    @PutMapping("/confirm-driver-arrival")
+    @PutMapping("/arrived")
     @ResponseStatus(HttpStatus.OK)
     public RideResponse confirmDriverArrival(@Valid @RequestBody ChangeRideStatusRequest changeRideStatusRequest) {
         return rideService.confirmDriverArrival(changeRideStatusRequest);

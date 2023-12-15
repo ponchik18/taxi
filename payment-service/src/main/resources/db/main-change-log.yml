@@ -1,17 +1,15 @@
 databaseChangeLog:
-  - # Start of include for table-payment-change-log.yml
-    include:
-      file: db/versions/table-payment-change-log.yml
-  - # End of include for table-payment-change-log.yml
-  - # Start of include for table-driver-balance-change-log.yml
-    include:
-      file: db/versions/table-driver-balance-change-log.yml
-  - # End of include for table-driver-balance-change-log.yml
-  - # Start of include for table-stripe-customer-log.yml
-    include:
-      file: db/versions/table-stripe-customer-log.yml
-  - # End of include for table-stripe-customer-log.yml
-  - # Start of include for table-credit-card-change-log.yml
-    include:
-      file: db/versions/table-credit-card-change-log.yml
-  - # End of include for table-credit-card-change-log.yml
+  - changeSet:
+      id: payment-service-db-init
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: db-init
+  - include:
+      file: db/versions/v-1.0/db.changelog-v.1.0.yml
+  - changeSet:
+      id: payment-service-create-tables
+      author: ponchik18
+      changes:
+        - tagDatabase:
+            tag: v-1.0

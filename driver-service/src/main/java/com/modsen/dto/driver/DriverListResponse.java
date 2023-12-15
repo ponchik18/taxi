@@ -8,6 +8,5 @@ import java.util.List;
 public record DriverListResponse(
         List<DriverResponse> drivers,
         int driverCount
-
 ) {
 }

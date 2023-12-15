@@ -30,6 +30,7 @@
         <lombok.mapstruct.binding.version>0.2.0</lombok.mapstruct.binding.version>
         <liquebase.maven.plugin.version>4.23.0</liquebase.maven.plugin.version>
         <spring.cloud.starter.parent.version>2022.0.3</spring.cloud.starter.parent.version>
+        <h2.version>2.2.224</h2.version>
     </properties>
     <dependencies>
         <dependency>

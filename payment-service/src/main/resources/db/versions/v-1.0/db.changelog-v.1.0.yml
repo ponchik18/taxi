@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: db/versions/v-1.0/table-payment-change-log.yml
+  -  include:
+       file: db/versions/v-1.0/table-driver-balance-change-log.yml
+  -  include:
+       file: db/versions/v-1.0/table-stripe-customer-log.yml
+  -  include:
+       file: db/versions/v-1.0/table-credit-card-change-log.yml
