@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: passenger-service
+  datasource:
+    password: password
+    url: jdbc:h2://me:db; DB_CLOSE_DELAY = -1;
+    username: ponchik18
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  liquibase:
+    enabled: false
