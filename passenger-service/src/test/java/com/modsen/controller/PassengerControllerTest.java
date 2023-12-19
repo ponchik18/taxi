@@ -6,6 +6,7 @@ import com.modsen.dto.passenger.PassengerListResponse;
 import com.modsen.dto.passenger.PassengerRequest;
 import com.modsen.dto.passenger.PassengerResponse;
 import com.modsen.service.PassengerService;
+import jdk.jfr.Category;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

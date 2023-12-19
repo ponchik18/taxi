@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -210,6 +212,7 @@ class PassengerServiceImplTest {
 
         // Then
         assertDoesNotThrow(() -> passengerService.deletePassenger(passengerId));
+        verify(passengerRepository, times(1)).deleteById(passengerId);
     }
 
     @Test
