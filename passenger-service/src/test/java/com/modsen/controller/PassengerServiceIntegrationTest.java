@@ -40,7 +40,7 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testGetAllPassenger() {
+    public void getAllPassengers_ValidRequest_Success() {
         ResponseEntity<PassengerListResponse> response = restTemplate.exchange(
                 PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH,
                 HttpMethod.GET,
@@ -54,8 +54,8 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testGetPassengerById() {
-        long passengerId = 1L;
+    public void getPassengerById_ValidId_Success() {
+        long passengerId = 9L;
 
         ResponseEntity<PassengerResponse> response = restTemplate.exchange(
                 PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH + "/" + passengerId,
@@ -70,7 +70,7 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testCreatePassenger() {
+    public void createPassenger_ValidRequest_Success() {
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "test_request45@test.com", "+375111781178");
 
         ResponseEntity<PassengerResponse> response = restTemplate.exchange(
@@ -90,7 +90,7 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testUpdatePassenger() {
+    public void updatePassenger_ValidIdAndRequest_Success() {
         long passengerId = 6L;
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "test_request2@test.com", "+375111114578");
 
@@ -112,7 +112,7 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testValidationWhenCreateOrUpdatePassenger() {
+    public void updatePassenger_InValidRequest_BadRequest() {
         long passengerId = 1L;
 
         ResponseEntity<PassengerResponse> response = restTemplate.exchange(
@@ -126,7 +126,7 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testConflictEmailWhenCreateOrUpdatePassenger() {
+    public void createPassenger_DuplicateEmail_ExceptionThrown() {
         String email = "john.doe@example.com";
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "", "+375111114578");
         passengerRequest.setEmail(email);
@@ -142,7 +142,7 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testConflictPhoneWhenCreateOrUpdatePassenger() {
+    public void createPassenger_DuplicatePhone_ExceptionThrown() {
         String phone = "+375111111119";
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "test_request3@test.com", "");
         passengerRequest.setPhone(phone);
@@ -158,7 +158,7 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testDeletePassengerById() {
+    public void deletePassenger_ExistingId_Success() {
         long passengerId = 5L;
 
         ResponseEntity<PassengerResponse> response = restTemplate.exchange(
@@ -172,7 +172,7 @@ public class PassengerServiceIntegrationTest {
     }
 
     @Test
-    public void testDeletePassengerByIdThrowNotFound() {
+    public void deletePassenger_NonExistingId_ExceptionThrown() {
         long passengerId = 999L;
 
         ResponseEntity<PassengerResponse> response = restTemplate.exchange(

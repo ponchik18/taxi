@@ -1,6 +1,7 @@
 package com.modsen.service.impl;
 
 import com.modsen.constants.PassengerServiceConstants;
+import com.modsen.constants.PassengerServiceTestConstants;
 import com.modsen.dto.passenger.PassengerListResponse;
 import com.modsen.dto.passenger.PassengerRequest;
 import com.modsen.dto.passenger.PassengerResponse;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,35 +37,34 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PassengerServiceImplTest {
 
-    private final String email = "passenger@mail.com";
-    private final String phone = "+375111111111";
     @Mock
     private PassengerRepository passengerRepository;
     @InjectMocks
     private PassengerServiceImpl passengerService;
 
     @Test
-    void testGetAllPassenger() {
+    void getAllPassenger_ValidPageSetting_Success() {
         // Given
         PageSetting pageSetting = new PageSetting();
         Pageable pageable = PageRequestFactory.buildPageRequest(pageSetting);
 
-        List<Passenger> passengers = Collections.singletonList(new Passenger());
-        Page<Passenger> page = new PageImpl<>(passengers);
+        List<Passenger> expectedPassengers = Collections.singletonList(new Passenger());
+        Page<Passenger> page = new PageImpl<>(expectedPassengers);
 
-        when(passengerRepository.findAll(pageable)).thenReturn(page);
+        when(passengerRepository.findAll(pageable))
+                .thenReturn(page);
 
         // When
-        PassengerListResponse result = passengerService.getAllPassenger(pageSetting);
+        PassengerListResponse actual = passengerService.getAllPassenger(pageSetting);
 
         // Then
-        assertNotNull(result);
-        assertEquals(passengers.size(), result.passengerCount());
-        assertEquals(passengers.size(), result.passengers().size());
+        assertNotNull(actual);
+        assertEquals(expectedPassengers.size(), actual.passengerCount());
+        assertEquals(expectedPassengers.size(), actual.passengers().size());
     }
 
     @Test
-    void testSuccessfullyCreatePassenger() {
+    void createPassenger_ValidPassengerRequest_Success() {
         // Given
         PassengerRequest passengerRequest = new PassengerRequest();
 
@@ -71,18 +72,18 @@ class PassengerServiceImplTest {
         when(passengerRepository.save(any())).thenReturn(new Passenger());
 
         // When
-        PassengerResponse result = passengerService.createPassenger(passengerRequest);
+        PassengerResponse actual = passengerService.createPassenger(passengerRequest);
 
         // Then
-        assertNotNull(result);
+        assertNotNull(actual);
     }
 
     @Test
-    void testDuplicateExceptionWhenCreatePassengerWithDuplicateEmail() {
+    void createPassenger_DuplicateEmail_ExceptionThrown() {
         // Given
         PassengerRequest passengerRequest = new PassengerRequest();
-        passengerRequest.setEmail(email);
-        String exceptionMessage = String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL, email);
+        passengerRequest.setEmail(PassengerServiceTestConstants.TestData.EMAIL);
+        String exceptionMessage = String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL, PassengerServiceTestConstants.TestData.EMAIL);
 
         // When
         when(passengerRepository.existsByEmail(any())).thenReturn(true);
@@ -94,11 +95,11 @@ class PassengerServiceImplTest {
     }
 
     @Test
-    void testDuplicateExceptionWhenCreatePassengerWithDuplicatePhone() {
+    void createPassenger_DuplicatePhone_ExceptionThrown() {
         // Given
         PassengerRequest passengerRequest = new PassengerRequest();
-        passengerRequest.setPhone(phone);
-        String exceptedMessage = String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE, phone);
+        passengerRequest.setPhone(PassengerServiceTestConstants.TestData.PHONE);
+        String exceptedMessage = String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE, PassengerServiceTestConstants.TestData.PHONE);
 
         // When
         when(passengerRepository.existsByPhone(any())).thenReturn(true);
@@ -110,27 +111,29 @@ class PassengerServiceImplTest {
     }
 
     @Test
-    void testSuccessfullyGetPassengerById() {
+    void getPassengerById_ExistingId_Success() {
         // Given
         long passengerId = 1L;
         Passenger passenger = new Passenger();
 
         // When
-        when(passengerRepository.findById(passengerId)).thenReturn(Optional.of(passenger));
-        PassengerResponse result = passengerService.getPassengerById(passengerId);
+        when(passengerRepository.findById(passengerId))
+                .thenReturn(Optional.of(passenger));
+        PassengerResponse actual = passengerService.getPassengerById(passengerId);
 
         // Then
-        assertNotNull(result);
+        assertNotNull(actual);
     }
 
     @Test
-    void testGetPassengerByIdPassengerNotFound() {
+    void getPassengerById_NonExistingId_ExceptionThrown() {
         // Given
         long nonExistentPassengerId = 1L;
         String exceptedMessage = String.format(PassengerServiceConstants.Errors.Message.PASSENGER_NOT_FOUND, nonExistentPassengerId);
 
         // Mock the repository behavior
-        when(passengerRepository.findById(nonExistentPassengerId)).thenReturn(Optional.empty());
+        when(passengerRepository.findById(nonExistentPassengerId))
+                .thenReturn(Optional.empty());
 
         // When/Then
         assertThatThrownBy(() -> passengerService.getPassengerById(nonExistentPassengerId))
@@ -139,41 +142,49 @@ class PassengerServiceImplTest {
     }
 
     @Test
-    void testSuccessfullyUpdatePassenger() {
+    void updatePassenger_ExistingIdAndValidRequest_Success() {
         // Given
         long passengerId = 1L;
         PassengerRequest passengerRequest = new PassengerRequest();
-        passengerRequest.setEmail(email);
-        passengerRequest.setPhone(phone);
+        passengerRequest.setEmail(PassengerServiceTestConstants.TestData.EMAIL);
+        passengerRequest.setPhone(PassengerServiceTestConstants.TestData.PHONE);
         Passenger existingPassenger = new Passenger();
-        existingPassenger.setEmail(email);
-        existingPassenger.setPhone(phone);
+        existingPassenger.setEmail(PassengerServiceTestConstants.TestData.EMAIL);
+        existingPassenger.setPhone(PassengerServiceTestConstants.TestData.PHONE);
+        PassengerResponse expectedPassengerResponse = PassengerResponse.builder()
+                .email(PassengerServiceTestConstants.TestData.EMAIL)
+                .phone(PassengerServiceTestConstants.TestData.PHONE)
+                .build();
 
         // When
-        when(passengerRepository.findById(passengerId)).thenReturn(Optional.of(existingPassenger));
-        when(passengerRepository.save(any())).thenReturn(new Passenger());
-        PassengerResponse result = passengerService.updatePassenger(passengerId, passengerRequest);
+        when(passengerRepository.findById(passengerId))
+                .thenReturn(Optional.of(existingPassenger));
+        when(passengerRepository.save(any()))
+                .thenReturn(existingPassenger);
+        PassengerResponse actual = passengerService.updatePassenger(passengerId, passengerRequest);
 
         // Then
-        assertNotNull(result);
+        assertNotNull(actual);
+        assertThat(actual).isEqualTo(expectedPassengerResponse);
     }
 
     @Test
-    void testDuplicateExceptionWhenUpdatePassengerWithPhone() {
+    void updatePassenger_DuplicatePhone_ExceptionThrown() {
         // Given
         long passengerId = 1L;
-        String passengerRequestPhone = "+0000000000";
         PassengerRequest passengerRequest = new PassengerRequest();
-        passengerRequest.setEmail(email);
-        passengerRequest.setPhone(passengerRequestPhone);
+        passengerRequest.setEmail(PassengerServiceTestConstants.TestData.EMAIL);
+        passengerRequest.setPhone(PassengerServiceTestConstants.TestData.PHONE);
         Passenger existingPassenger = new Passenger();
-        existingPassenger.setEmail(email);
-        existingPassenger.setPhone(phone);
-        String exceptedMessage = String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE, passengerRequestPhone);
+        existingPassenger.setEmail(PassengerServiceTestConstants.TestData.EMAIL);
+        existingPassenger.setPhone("+00000000000");
+        String exceptedMessage = String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE, PassengerServiceTestConstants.TestData.PHONE);
 
         // When
-        when(passengerRepository.findById(passengerId)).thenReturn(Optional.of(existingPassenger));
-        when(passengerRepository.existsByPhone(passengerRequest.getPhone())).thenReturn(true);
+        when(passengerRepository.findById(passengerId))
+                .thenReturn(Optional.of(existingPassenger));
+        when(passengerRepository.existsByPhone(passengerRequest.getPhone()))
+                .thenReturn(true);
 
         // Then
         assertThatThrownBy(() -> passengerService.updatePassenger(passengerId, passengerRequest))
@@ -182,15 +193,14 @@ class PassengerServiceImplTest {
     }
 
     @Test
-    void testDuplicateExceptionWhenUpdatePassengerWithEmail() {
+    void updatePassenger_DuplicateEmail_ExceptionThrown() {
         // Given
         long passengerId = 1L;
-        String passengerRequestEmail = "test@test.com";
         PassengerRequest passengerRequest = new PassengerRequest();
-        passengerRequest.setEmail(passengerRequestEmail);
+        passengerRequest.setEmail(PassengerServiceTestConstants.TestData.EMAIL);
         Passenger existingPassenger = new Passenger();
-        existingPassenger.setEmail(email);
-        String exceptedMessage = String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL, passengerRequestEmail);
+        existingPassenger.setEmail("test@gmail.com");
+        String exceptedMessage = String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL, PassengerServiceTestConstants.TestData.EMAIL);
 
         // When
         when(passengerRepository.findById(passengerId)).thenReturn(Optional.of(existingPassenger));
@@ -203,7 +213,7 @@ class PassengerServiceImplTest {
     }
 
     @Test
-    void testSuccessfullyDeletePassenger() {
+    void deletePassenger_ExistingId_Success() {
         // Given
         long passengerId = 1L;
 
@@ -216,7 +226,7 @@ class PassengerServiceImplTest {
     }
 
     @Test
-    void testDeletePassengerNotFound() {
+    void deletePassenger_NonExistingId_ExceptionThrown() {
         // Given
         long passengerId = 1L;
         String expectedMessage = String.format(PassengerServiceConstants.Errors.Message.PASSENGER_NOT_FOUND, passengerId);

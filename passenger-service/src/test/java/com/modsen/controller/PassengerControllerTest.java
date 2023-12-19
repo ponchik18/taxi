@@ -2,11 +2,11 @@ package com.modsen.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modsen.constants.PassengerServiceConstants;
+import com.modsen.constants.PassengerServiceTestConstants;
 import com.modsen.dto.passenger.PassengerListResponse;
 import com.modsen.dto.passenger.PassengerRequest;
 import com.modsen.dto.passenger.PassengerResponse;
 import com.modsen.service.PassengerService;
-import jdk.jfr.Category;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,23 +49,24 @@ class PassengerControllerTest {
     @BeforeEach
     public void init() {
         passengerResponse = PassengerResponse.builder()
-                .email("test@test.com")
-                .phone("+375111111111")
+                .email(PassengerServiceTestConstants.TestData.EMAIL)
+                .phone(PassengerServiceTestConstants.TestData.PHONE)
                 .firstName("Test")
                 .lastName("Test")
                 .id(1)
                 .build();
-        passengerRequest = new PassengerRequest("Test", "Test", "test@test.com", "+375111111111");
+        passengerRequest = new PassengerRequest("Test", "Test", PassengerServiceTestConstants.TestData.EMAIL, PassengerServiceTestConstants.TestData.PHONE);
     }
 
     @Test
-    void testGetAllPassenger() throws Exception {
+    void getAllPassengers_ValidRequest_Success() throws Exception {
         PassengerListResponse passengerListResponse = PassengerListResponse.builder()
                 .passengers(List.of(passengerResponse))
                 .passengerCount(1)
                 .build();
 
-        when(passengerService.getAllPassenger(any())).thenReturn(passengerListResponse);
+        when(passengerService.getAllPassenger(any()))
+                .thenReturn(passengerListResponse);
         ResultActions response = mockMvc.perform(get(PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH)
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -74,7 +75,7 @@ class PassengerControllerTest {
     }
 
     @Test
-    void testSuccessfullyCreatePassenger() throws Exception {
+    void createPassenger_ValidRequest_Success() throws Exception {
         given(passengerService.createPassenger((any())))
                 .willAnswer(invocation -> passengerResponse);
 
@@ -92,7 +93,7 @@ class PassengerControllerTest {
     }
 
     @Test
-    void tetGetPassengerById() throws Exception {
+    void getPassengerById_ValidId_Success() throws Exception {
         int passengerId = passengerResponse.id();
 
         when(passengerService.getPassengerById(passengerId)).thenReturn(passengerResponse);
@@ -104,7 +105,7 @@ class PassengerControllerTest {
     }
 
     @Test
-    void testSuccessfullyUpdatePassenger() throws Exception {
+    void updatePassenger_ValidIdAndRequest_Success() throws Exception {
         int passengerId = passengerResponse.id();
         given(passengerService.updatePassenger(anyLong(), any()))
                 .willAnswer(invocation -> passengerResponse);
@@ -122,7 +123,7 @@ class PassengerControllerTest {
     }
 
     @Test
-    void deletePassenger() throws Exception {
+    void deletePassenger_ValidId_Success() throws Exception {
         int passengerId = passengerResponse.id();
 
         when(passengerService.getPassengerById(passengerId)).thenReturn(passengerResponse);
@@ -133,7 +134,7 @@ class PassengerControllerTest {
     }
 
     @Test
-    void testValidationFailsForEmptyFields() throws Exception {
+    void createPassenger_InValidRequest_BadRequest() throws Exception {
         PassengerRequest passengerRequest = new PassengerRequest("", "", "", "");
 
         ResultActions response = mockMvc.perform(post(PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH)
