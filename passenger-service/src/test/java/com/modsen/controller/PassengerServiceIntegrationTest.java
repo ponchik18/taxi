@@ -1,24 +1,19 @@
 package com.modsen.controller;
 
 import com.modsen.constants.PassengerServiceConstants;
-import com.modsen.dto.passenger.PassengerListResponse;
 import com.modsen.dto.passenger.PassengerRequest;
 import com.modsen.dto.passenger.PassengerResponse;
+import com.modsen.util.PassengerServiceClient;
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -29,9 +24,15 @@ public class PassengerServiceIntegrationTest {
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres");
+    @LocalServerPort
+    private Integer port;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @BeforeEach
+    public void beforeEach() {
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = port;
+        RestAssured.basePath = PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH;
+    }
 
     @Test
     void connectionEstablished() {
@@ -41,88 +42,44 @@ public class PassengerServiceIntegrationTest {
 
     @Test
     public void getAllPassengers_ValidRequest_Success() {
-        ResponseEntity<PassengerListResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH,
-                HttpMethod.GET,
-                null,
-                PassengerListResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(Objects.requireNonNull(response.getBody()).passengerCount()).isGreaterThan(0);
+        PassengerServiceClient.getAllPassengers();
     }
 
     @Test
     public void getPassengerById_ValidId_Success() {
         long passengerId = 9L;
 
-        ResponseEntity<PassengerResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH + "/" + passengerId,
-                HttpMethod.GET,
-                null,
-                PassengerResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(Objects.requireNonNull(response.getBody()).id()).isEqualTo(passengerId);
+        PassengerServiceClient.getPassenger(passengerId);
     }
 
     @Test
     public void createPassenger_ValidRequest_Success() {
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "test_request45@test.com", "+375111781178");
 
-        ResponseEntity<PassengerResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH,
-                HttpMethod.POST,
-                new HttpEntity<>(passengerRequest),
-                PassengerResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        PassengerResponse responseBody = response.getBody();
-        assert responseBody != null;
-        assertThat(responseBody.email()).isEqualTo(passengerRequest.getEmail());
-        assertThat(responseBody.phone()).isEqualTo(passengerRequest.getPhone());
-        assertThat(responseBody.firstName()).isEqualTo(passengerRequest.getFirstName());
-        assertThat(responseBody.lastName()).isEqualTo(passengerRequest.getLastName());
+        PassengerServiceClient.postPassenger(passengerRequest);
     }
 
     @Test
     public void updatePassenger_ValidIdAndRequest_Success() {
         long passengerId = 6L;
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "test_request2@test.com", "+375111114578");
+        PassengerResponse expectedPassenger = PassengerResponse.builder()
+                .id(Long.valueOf(passengerId).intValue())
+                .lastName(passengerRequest.getLastName())
+                .firstName(passengerRequest.getFirstName())
+                .phone(passengerRequest.getPhone())
+                .email(passengerRequest.getEmail())
+                .build();
 
-        ResponseEntity<PassengerResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH + "/" + passengerId,
-                HttpMethod.PUT,
-                new HttpEntity<>(passengerRequest),
-                PassengerResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        PassengerResponse responseBody = response.getBody();
-        assertThat(responseBody).isNotNull();
-        assert responseBody != null;
-        assertThat(responseBody.email()).isEqualTo(passengerRequest.getEmail());
-        assertThat(responseBody.phone()).isEqualTo(passengerRequest.getPhone());
-        assertThat(responseBody.firstName()).isEqualTo(passengerRequest.getFirstName());
-        assertThat(responseBody.lastName()).isEqualTo(passengerRequest.getLastName());
+        PassengerResponse actual = PassengerServiceClient.updatePassenger(passengerId, passengerRequest);
+        assertThat(actual).isEqualTo(expectedPassenger);
     }
 
     @Test
     public void updatePassenger_InValidRequest_BadRequest() {
         long passengerId = 1L;
 
-        ResponseEntity<PassengerResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH + "/" + passengerId,
-                HttpMethod.PUT,
-                new HttpEntity<>(new PassengerRequest()),
-                PassengerResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        PassengerServiceClient.updatePassengerInvalidRequest(passengerId, new PassengerRequest());
     }
 
     @Test
@@ -131,14 +88,7 @@ public class PassengerServiceIntegrationTest {
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "", "+375111114578");
         passengerRequest.setEmail(email);
 
-        ResponseEntity<PassengerResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH,
-                HttpMethod.POST,
-                new HttpEntity<>(passengerRequest),
-                PassengerResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        PassengerServiceClient.postPassengerWithDuplicate(passengerRequest);
     }
 
     @Test
@@ -147,41 +97,20 @@ public class PassengerServiceIntegrationTest {
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "test_request3@test.com", "");
         passengerRequest.setPhone(phone);
 
-        ResponseEntity<PassengerResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH,
-                HttpMethod.POST,
-                new HttpEntity<>(passengerRequest),
-                PassengerResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        PassengerServiceClient.postPassengerWithDuplicate(passengerRequest);
     }
 
     @Test
     public void deletePassenger_ExistingId_Success() {
         long passengerId = 5L;
 
-        ResponseEntity<PassengerResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH + "/" + passengerId,
-                HttpMethod.DELETE,
-                null,
-                PassengerResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        PassengerServiceClient.deletePassenger(passengerId);
     }
 
     @Test
     public void deletePassenger_NonExistingId_ExceptionThrown() {
         long passengerId = 999L;
 
-        ResponseEntity<PassengerResponse> response = restTemplate.exchange(
-                PassengerServiceConstants.Path.PASSENGER_CONTROLLER_PATH + "/" + passengerId,
-                HttpMethod.DELETE,
-                null,
-                PassengerResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        PassengerServiceClient.deletePassengerNonExists(passengerId);
     }
 }
