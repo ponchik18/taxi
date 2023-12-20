@@ -3,19 +3,25 @@ package com.modsen.controller;
 import com.modsen.constants.PassengerServiceConstants;
 import com.modsen.dto.passenger.PassengerRequest;
 import com.modsen.dto.passenger.PassengerResponse;
+import com.modsen.exception.ErrorMessageResponse;
 import com.modsen.util.PassengerServiceClient;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,21 +48,43 @@ public class PassengerServiceIntegrationTest {
 
     @Test
     public void getAllPassengers_ValidRequest_Success() {
-        PassengerServiceClient.getAllPassengers();
+        Response actualResponse = PassengerServiceClient.getAllPassengers();
+
+        actualResponse.then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body("passengerCount", greaterThan(0));
     }
 
     @Test
     public void getPassengerById_ValidId_Success() {
         long passengerId = 9L;
 
-        PassengerServiceClient.getPassenger(passengerId);
+        Response actualResponse = PassengerServiceClient.getPassenger(passengerId);
+
+        actualResponse.then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body(matchesJsonSchemaInClasspath("data/passenger-response.json"))
+                .body("id", equalTo(Long.valueOf(passengerId).intValue()));
     }
 
     @Test
     public void createPassenger_ValidRequest_Success() {
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "test_request45@test.com", "+375111781178");
 
-        PassengerServiceClient.postPassenger(passengerRequest);
+        Response actualresponse = PassengerServiceClient.postPassenger(passengerRequest);
+
+        PassengerResponse actualPassenger = actualresponse.then()
+                .assertThat()
+                .statusCode(HttpStatus.CREATED.value())
+                .body(matchesJsonSchemaInClasspath("data/passenger-response.json"))
+                .extract()
+                .as(PassengerResponse.class);
+        assertThat(actualPassenger)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(passengerRequest);
     }
 
     @Test
@@ -71,15 +99,29 @@ public class PassengerServiceIntegrationTest {
                 .email(passengerRequest.getEmail())
                 .build();
 
-        PassengerResponse actual = PassengerServiceClient.updatePassenger(passengerId, passengerRequest);
+        Response actualResponse = PassengerServiceClient.updatePassenger(passengerId, passengerRequest);
+
+        PassengerResponse actual = actualResponse.then()
+                .assertThat()
+                .statusCode(HttpStatus.OK.value())
+                .body(matchesJsonSchemaInClasspath("data/passenger-response.json"))
+                .extract()
+                .body()
+                .as(PassengerResponse.class);
         assertThat(actual).isEqualTo(expectedPassenger);
     }
 
     @Test
     public void updatePassenger_InValidRequest_BadRequest() {
         long passengerId = 1L;
+        int expectedStatus = HttpStatus.BAD_REQUEST.value();
 
-        PassengerServiceClient.updatePassengerInvalidRequest(passengerId, new PassengerRequest());
+        Response actualResponse = PassengerServiceClient.updatePassenger(passengerId, new PassengerRequest());
+
+        actualResponse.then()
+                .assertThat()
+                .statusCode(expectedStatus)
+                .body("statusCode", equalTo(expectedStatus));
     }
 
     @Test
@@ -87,8 +129,23 @@ public class PassengerServiceIntegrationTest {
         String email = "john.doe@example.com";
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "", "+375111114578");
         passengerRequest.setEmail(email);
+        int expectedStatus = HttpStatus.CONFLICT.value();
+        ErrorMessageResponse expectedMessage = ErrorMessageResponse.builder()
+                .message(String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_EMAIL, email))
+                .statusCode(expectedStatus)
+                .build();
 
-        PassengerServiceClient.postPassengerWithDuplicate(passengerRequest);
+        Response actualResponse = PassengerServiceClient.postPassenger(passengerRequest);
+
+        ErrorMessageResponse actualMessage = actualResponse.then()
+                .assertThat()
+                .statusCode(expectedStatus)
+                .extract()
+                .as(ErrorMessageResponse.class);
+        assertThat(actualMessage)
+                .usingRecursiveComparison()
+                .ignoringFields("timestamp")
+                .isEqualTo(expectedMessage);
     }
 
     @Test
@@ -97,20 +154,58 @@ public class PassengerServiceIntegrationTest {
         PassengerRequest passengerRequest = new PassengerRequest("Test", "Test", "test_request3@test.com", "");
         passengerRequest.setPhone(phone);
 
-        PassengerServiceClient.postPassengerWithDuplicate(passengerRequest);
+        int expectedStatus = HttpStatus.CONFLICT.value();
+        ErrorMessageResponse expectedMessage = ErrorMessageResponse.builder()
+                .message(String.format(PassengerServiceConstants.Errors.Message.DUPLICATE_PASSENGER_WITH_PHONE, phone))
+                .statusCode(expectedStatus)
+                .build();
+
+        Response actualResponse = PassengerServiceClient.postPassenger(passengerRequest);
+
+        ErrorMessageResponse actualMessage = actualResponse.then()
+                .assertThat()
+                .statusCode(expectedStatus)
+                .extract()
+                .as(ErrorMessageResponse.class);
+        assertThat(actualMessage)
+                .usingRecursiveComparison()
+                .ignoringFields("timestamp")
+                .isEqualTo(expectedMessage);
+
+
     }
 
     @Test
     public void deletePassenger_ExistingId_Success() {
         long passengerId = 5L;
 
-        PassengerServiceClient.deletePassenger(passengerId);
+        Response actualResponse = PassengerServiceClient.deletePassenger(passengerId);
+
+        actualResponse.then()
+                .assertThat()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
     public void deletePassenger_NonExistingId_ExceptionThrown() {
         long passengerId = 999L;
+        int expectedStatus = HttpStatus.NOT_FOUND.value();
+        ErrorMessageResponse expectedMessage = ErrorMessageResponse.builder()
+                .message(String.format(PassengerServiceConstants.Errors.Message.PASSENGER_NOT_FOUND, passengerId))
+                .statusCode(expectedStatus)
+                .build();
 
-        PassengerServiceClient.deletePassengerNonExists(passengerId);
+        Response actualResponse = PassengerServiceClient.deletePassenger(passengerId);
+
+        ErrorMessageResponse actualMessage = actualResponse.then()
+                .assertThat()
+                .statusCode(expectedStatus)
+                .extract()
+                .as(ErrorMessageResponse.class);
+        assertThat(actualMessage)
+                .usingRecursiveComparison()
+                .ignoringFields("timestamp")
+                .isEqualTo(expectedMessage);
+
     }
 }
