@@ -3,11 +3,14 @@ spring:
     name: passenger-service
   datasource:
     password: password
-    url: jdbc:h2://me:db; DB_CLOSE_DELAY = -1;
+    url: jdbc:h2:mem:me;DB_CLOSE_DELAY=-1;
     username: ponchik18
+  liquibase:
+    enabled: false
   jpa:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
-  liquibase:
-    enabled: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
