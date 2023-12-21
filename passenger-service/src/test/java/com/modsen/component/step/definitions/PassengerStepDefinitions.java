@@ -23,7 +23,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PassengerStepDefinitions {
     private PassengerRequest createPassengerRequest;
+    private PassengerRequest updatedPassengerRequest;
     private long passengerId = 1L;
+    private long updatedPassengerId;
     @LocalServerPort
     private Integer port;
 
@@ -60,24 +62,73 @@ public class PassengerStepDefinitions {
 
     }
 
-    @Given("the passenger ID is {long}")
+    @Given("The passenger ID is {long}")
     public void thePassengerIDIs(long passengerId) {
         this.passengerId = passengerId;
-        PassengerServiceClient.postPassenger(new PassengerRequest("Test", "Test", PassengerServiceTestConstants.TestData.EMAIL, PassengerServiceTestConstants.TestData.PHONE));
     }
 
     @Sql(scripts = "classpath:data/insert-test-data.sql")
-    @When("the client deletes the passenger by ID")
+    @When("The client deletes the passenger by ID")
     public void whenDeletePassengerById() {
+        PassengerServiceClient.postPassenger(new PassengerRequest("Test", "Test", PassengerServiceTestConstants.TestData.EMAIL, PassengerServiceTestConstants.TestData.PHONE));
+
         Response actualResponse = PassengerServiceClient.deletePassenger(passengerId);
         actualResponse.then()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
-    @Then("the response should indicate a successful deletion")
+    @Then("The response should indicate a successful deletion")
     public void theResponseShouldIndicateASuccessfulDeletion() {
         int expectedStatus = HttpStatus.NOT_FOUND.value();
+        ErrorMessageResponse expectedMessage = ErrorMessageResponse.builder()
+                .message(String.format(PassengerServiceConstants.Errors.Message.PASSENGER_NOT_FOUND, passengerId))
+                .statusCode(expectedStatus)
+                .build();
+
+        Response actualResponse = PassengerServiceClient.getPassenger(passengerId);
+
+        ErrorMessageResponse actualMessage = actualResponse.then()
+                .assertThat()
+                .statusCode(expectedStatus)
+                .extract()
+                .as(ErrorMessageResponse.class);
+        assertThat(actualMessage)
+                .usingRecursiveComparison()
+                .ignoringFields("timestamp")
+                .isEqualTo(expectedMessage);
+    }
+
+    @When("The client updates the passenger data first name {string}, last name {string}, email {string}, and phone {string}")
+    public void UpdatePassengerDetails(String firstName, String lastName, String email, String phone) {
+        updatedPassengerId = PassengerServiceClient.postPassenger(createPassengerRequest)
+                .as(PassengerResponse.class)
+                .id();
+        updatedPassengerRequest = new PassengerRequest(firstName, lastName, email, phone);
+        PassengerServiceClient.updatePassenger(updatedPassengerId, updatedPassengerRequest);
+    }
+
+    @Then("The response should contain the updated passenger details")
+    public void thenResponseShouldContainTheUpdatedPassengerDetails() {
+        Response actualResponse = PassengerServiceClient.getPassenger(updatedPassengerId);
+
+        PassengerResponse actualPassengerResponse = actualResponse.then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(PassengerResponse.class);
+        assertThat(actualPassengerResponse)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(updatedPassengerRequest);
+    }
+
+    @When("The client requests the passenger by ID")
+    public void whenGetPassengerById() {
+
+    }
+
+    @Then("The response should return {int}")
+    public void theResponseShouldReturn(int expectedStatus) {
         ErrorMessageResponse expectedMessage = ErrorMessageResponse.builder()
                 .message(String.format(PassengerServiceConstants.Errors.Message.PASSENGER_NOT_FOUND, passengerId))
                 .statusCode(expectedStatus)

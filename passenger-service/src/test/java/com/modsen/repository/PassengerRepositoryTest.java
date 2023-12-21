@@ -40,8 +40,6 @@ public class PassengerRepositoryTest {
 
     @Test
     void existsByEmail_PassengerNotExists_ReturnsFalse() {
-        passengerRepository.save(passenger);
-
         boolean exists = passengerRepository.existsByEmail(PassengerServiceTestConstants.TestData.EMAIL);
         assertThat(exists).isFalse();
     }
@@ -56,8 +54,6 @@ public class PassengerRepositoryTest {
 
     @Test
     void existsByPhone_PassengerNotExists_ReturnsFalse() {
-        passengerRepository.save(passenger);
-
         boolean exists = passengerRepository.existsByPhone(PassengerServiceTestConstants.TestData.PHONE);
         assertThat(exists).isFalse();
     }
