@@ -5,6 +5,6 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(features = "src/test/resources/features/passengers.feature", glue = "com.modsen.component.step.definitions")
+@CucumberOptions(features = "src/test/resources/features/passengers-serivice-component.feature", glue = "com.modsen.component.step.definitions")
 public class ComponentTest {
 }

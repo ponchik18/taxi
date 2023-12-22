@@ -1,4 +1,4 @@
-Feature: Passenger-service operation
+Feature: Passenger-service operation for end-to-end-test
   Scenario: Create a new passenger
     Given The passenger-service is running
     Given The passenger data with first name "Test", last name "Test", email "test_cucumber@test.com", and phone "+375444444444"
