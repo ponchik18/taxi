@@ -1,4 +1,4 @@
-package com.modsen.component.step.definitions;
+package com.modsen.end_to_end.step.definitions;
 
 import com.modsen.constants.PassengerServiceConstants;
 import com.modsen.constants.PassengerServiceTestConstants;
@@ -21,7 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @CucumberContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PassengerStepDefinitions {
+public class PassengerEndToEndStepDefinitions {
     private PassengerRequest createPassengerRequest;
     private PassengerRequest updatedPassengerRequest;
     private long passengerId = 1L;
