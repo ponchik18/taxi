@@ -24,12 +24,10 @@ public class RideDriverRequestHandler implements MessageHandler {
     private MessageChannel producingChannel;
     @Value("${spring.integration.kafka.sent-topic}")
     private String springIntegrationKafkaSentTopic;
-
     @Autowired
     public void setDriverRepository(DriverRepository driverRepository) {
         this.driverRepository = driverRepository;
     }
-
     @Autowired
     public void setProducingChannel(MessageChannel producingChannel) {
         this.producingChannel = producingChannel;
@@ -57,5 +55,4 @@ public class RideDriverRequestHandler implements MessageHandler {
             );
         }
     }
-
 }

@@ -1,4 +1,4 @@
-package com.modsen.component.step.definitions;
+package com.modsen.component;
 
 import com.modsen.dto.passenger.PassengerListResponse;
 import com.modsen.dto.passenger.PassengerRequest;

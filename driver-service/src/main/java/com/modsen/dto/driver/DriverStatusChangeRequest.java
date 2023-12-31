@@ -14,5 +14,6 @@ public class DriverStatusChangeRequest {
     @NotNull(message = DriverServiceConstants.Validation.Message.FIELD_EMPTY)
     @Min(value = 0, message = DriverServiceConstants.Validation.Message.VALUE_LESS_ZERO)
     private Long driverId;
+    @NotNull(message = DriverServiceConstants.Validation.Message.FIELD_EMPTY)
     private String status;
 }

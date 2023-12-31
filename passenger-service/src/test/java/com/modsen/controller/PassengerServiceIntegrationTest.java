@@ -4,11 +4,14 @@ import com.modsen.constants.PassengerServiceConstants;
 import com.modsen.dto.passenger.PassengerRequest;
 import com.modsen.dto.passenger.PassengerResponse;
 import com.modsen.exception.ErrorMessageResponse;
+import com.modsen.model.Passenger;
+import com.modsen.repository.PassengerRepository;
 import com.modsen.util.PassengerServiceClient;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -32,6 +35,8 @@ public class PassengerServiceIntegrationTest {
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres");
     @LocalServerPort
     private Integer port;
+    @Autowired
+    private PassengerRepository passengerRepository;
 
     @BeforeEach
     public void beforeEach() {
@@ -75,16 +80,20 @@ public class PassengerServiceIntegrationTest {
 
         Response actualresponse = PassengerServiceClient.postPassenger(passengerRequest);
 
-        PassengerResponse actualPassenger = actualresponse.then()
+        PassengerResponse actualPassengerResponse = actualresponse.then()
                 .assertThat()
                 .statusCode(HttpStatus.CREATED.value())
                 .body(matchesJsonSchemaInClasspath("data/passenger-response.json"))
                 .extract()
                 .as(PassengerResponse.class);
-        assertThat(actualPassenger)
+        assertThat(actualPassengerResponse)
                 .usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(passengerRequest);
+        Passenger actualPassenger = passengerRepository.findById((long)actualPassengerResponse.id())
+                .orElseThrow();
+        assertThat(actualPassenger).usingRecursiveComparison()
+                .isEqualTo(actualPassenger);
     }
 
     @Test
@@ -109,6 +118,11 @@ public class PassengerServiceIntegrationTest {
                 .body()
                 .as(PassengerResponse.class);
         assertThat(actual).isEqualTo(expectedPassenger);
+        Passenger actualPassenger = passengerRepository.findById(passengerId)
+                .orElseThrow();
+        assertThat(actualPassenger).usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(expectedPassenger);
     }
 
     @Test
@@ -171,8 +185,6 @@ public class PassengerServiceIntegrationTest {
                 .usingRecursiveComparison()
                 .ignoringFields("timestamp")
                 .isEqualTo(expectedMessage);
-
-
     }
 
     @Test
@@ -206,6 +218,5 @@ public class PassengerServiceIntegrationTest {
                 .usingRecursiveComparison()
                 .ignoringFields("timestamp")
                 .isEqualTo(expectedMessage);
-
     }
 }

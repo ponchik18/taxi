@@ -1,10 +1,7 @@
 package com.modsen.service.impl;
 
-import com.modsen.dto.card.CreditCardResponse;
 import com.modsen.dto.driver.DriverChangeStatusForKafkaRequest;
-import com.modsen.dto.passenger.PassengerResponse;
 import com.modsen.dto.payment.PaymentRequest;
-import com.modsen.dto.payment.PaymentResponse;
 import com.modsen.dto.promo.PromoCodeApplyRequest;
 import com.modsen.dto.promo.PromoCodeResponse;
 import com.modsen.dto.rides.ChangeRideStatusRequest;
@@ -14,29 +11,27 @@ import com.modsen.dto.rides.RidePassengerRequest;
 import com.modsen.dto.rides.RideResponse;
 import com.modsen.enums.DriverStatus;
 import com.modsen.enums.RideStatus;
-import com.modsen.enums.UserRole;
 import com.modsen.exception.PromoCodeAlreadyAppliedException;
+import com.modsen.exception.PromoCodeNotFoundException;
 import com.modsen.exception.RideCancelException;
 import com.modsen.exception.RideNotFoundException;
 import com.modsen.mapper.RideMapper;
 import com.modsen.model.PageSetting;
 import com.modsen.model.Ride;
 import com.modsen.repository.RideRepository;
+import com.modsen.service.PassengerServiceWebClient;
+import com.modsen.service.PaymentServiceWebClient;
+import com.modsen.service.PromoCodeServiceWebClient;
 import com.modsen.service.RideService;
 import com.modsen.util.PageRequestFactory;
-import com.modsen.util.WebClientErrorHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -44,16 +39,15 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final MessageChannel producingChannel;
-    private final WebClient passengerServiceWebClient;
-    private final WebClient paymentServiceWebClient;
-    private final WebClient promoCodeServiceWebClient;
+    private final PassengerServiceWebClient passengerServiceWebClient;
+    private final PaymentServiceWebClient paymentServiceWebClient;
+    private final PromoCodeServiceWebClient promoCodeServiceWebClient;
     private final KafkaTemplate<String, Object> customKafkaTemplate;
 
     @Value("${spring.integration.kafka.sent-topic}")
@@ -101,11 +95,6 @@ public class RideServiceImpl implements RideService {
                 rideDriverRequest,
                 Collections.singletonMap(KafkaHeaders.TOPIC, springIntegrationKafkaAcceptedTopic))
         );
-    }
-
-    private BigDecimal generateCost() {
-        return BigDecimal.valueOf(Math.random() * 100 + 1)
-                .setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
@@ -172,7 +161,7 @@ public class RideServiceImpl implements RideService {
         ride.setStatus(RideStatus.COMPLETED);
         ride.setEndTime(LocalDateTime.now());
 
-        makeCharge(paymentRequest);
+        paymentServiceWebClient.makeCharge(paymentRequest);
         customKafkaTemplate.send(
                 springKafkaChangeDriverStatus,
                 new DriverChangeStatusForKafkaRequest(ride.getDriverId(), DriverStatus.AVAILABLE)
@@ -190,8 +179,8 @@ public class RideServiceImpl implements RideService {
         if (ride.getIsPromoCodeApplied()) {
             throw new PromoCodeAlreadyAppliedException(promoCodeApplyRequest.getPromoCode());
         }
-        PromoCodeResponse promoCodeResponse = applyPromoCode(promoCodeApplyRequest)
-                .orElseThrow(() -> new PromoCodeAlreadyAppliedException(promoCodeApplyRequest.getPromoCode()));
+        PromoCodeResponse promoCodeResponse = promoCodeServiceWebClient.applyPromoCodeForRide(promoCodeApplyRequest)
+                .orElseThrow(() -> new PromoCodeNotFoundException(promoCodeApplyRequest.getPromoCode()));
 
         ride.setIsPromoCodeApplied(true);
         BigDecimal newPriceForRide = ride.getCost()
@@ -202,30 +191,9 @@ public class RideServiceImpl implements RideService {
         return RideMapper.MAPPER_INSTANCE.mapToRideResponse(rideRepository.save(ride));
     }
 
-    private Optional<PromoCodeResponse> applyPromoCode(PromoCodeApplyRequest promoCodeApplyRequest) {
-        return Optional.ofNullable(promoCodeServiceWebClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/apply/{name}")
-                        .build(promoCodeApplyRequest.getPromoCode()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(BodyInserters.fromValue(promoCodeApplyRequest))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle4xxError)
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle5xxError)
-                .bodyToMono(PromoCodeResponse.class)
-                .block());
-    }
-
-    private void makeCharge(PaymentRequest paymentRequest) {
-        paymentServiceWebClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/charge")
-                        .build())
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(paymentRequest))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle4xxError)
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle5xxError)
-                .bodyToMono(PaymentResponse.class)
-                .block();
+    private BigDecimal generateCost() {
+        return BigDecimal.valueOf(Math.random() * 100 + 1)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     private Ride getRideByChangeRideStatusRequest(ChangeRideStatusRequest changeRideStatusRequest) {
@@ -236,24 +204,8 @@ public class RideServiceImpl implements RideService {
     }
 
     private void validatePassenger(Long passengerId) {
-        passengerServiceWebClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/{id}")
-                        .build(passengerId))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle4xxError)
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle5xxError)
-                .bodyToMono(PassengerResponse.class)
-                .block();
+        passengerServiceWebClient.getPassengerById(passengerId);
 
-        paymentServiceWebClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/card/default")
-                        .queryParam("userId", passengerId)
-                        .queryParam("userRole", UserRole.PASSENGER.name())
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle4xxError)
-                .onStatus(HttpStatusCode::is4xxClientError, WebClientErrorHandler::handle5xxError)
-                .bodyToMono(CreditCardResponse.class)
-                .block();
+        paymentServiceWebClient.getDefaultCardForPassenger(passengerId);
     }
 }

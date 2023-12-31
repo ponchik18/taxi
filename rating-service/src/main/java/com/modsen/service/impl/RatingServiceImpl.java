@@ -73,7 +73,7 @@ public class RatingServiceImpl implements RatingService {
     private void validateRatingRequest(RatingRequest ratingRequest) {
         UserRole userRole = UserRoleMapper.mapToUserRole(ratingRequest.getUserRole());
         if (ratingRepository.existsByEntityIdAndUserRoleAndRideId(ratingRequest.getEntityId(), userRole, ratingRequest.getRideId())) {
-            throw new RatingAlreadyExistsException(ratingRequest.getRideId(), userRole);
+            throw new RatingAlreadyExistsException(ratingRequest.getRideId(), ratingRequest.getUserRole());
         }
         validateRide(ratingRequest.getRideId());
         switch (userRole) {
