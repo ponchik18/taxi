@@ -97,7 +97,8 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     public CreditCardResponse getCreditCardById(long id) {
-        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(() -> new CreditCardNotFoundException(id));
+        CreditCard creditCard = creditCardRepository.findById(id)
+                .orElseThrow(() -> new CreditCardNotFoundException(id));
         return CreditCardMapper.MAPPER_INSTANCE.mapToCreditCardResponse(creditCard);
     }
 

@@ -17,6 +17,9 @@ public interface RidesServiceConstants {
         interface Message {
             String RIDE_NOT_FOUND = "Ride with id %d not found!";
             String NOT_VALID_FIELD = "There is an error in the information entered in the ride's fields!";
+            String RIDE_CAN_NOT_BE_CANCELED = "Ride with id = '%d' can't be cancel because of status '%s'";
+            String PROMO_CODE_ALREADY_APPLIED = "Promo code '%s' has been already applied!";
+            String PROMO_CODE_NOT_FOUND = "Promo-code with name '%s' not found!";
         }
     }
     interface Path {
