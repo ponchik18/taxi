@@ -14,3 +14,14 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+  integration:
+    kafka:
+      bootstrap-servers: localhost:9092
+      sent-topic: test-create-ride
+      accepted-topic: test-save-ride
+      group_id: rides-service
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+    producer:
+      change-driver-status-topic: change-driver-status

@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(
         name = PaymentServiceConstants.BasePath.PASSENGER_SERVICE_NAME,
         configuration = FeignClientConfiguration.class,
-        path = PaymentServiceConstants.BasePath.PASSENGER_SERVICE_PATH)public interface PassengerServiceClient {
+        path = PaymentServiceConstants.BasePath.PASSENGER_SERVICE_PATH)
+public interface PassengerServiceClient {
     @GetMapping("/{id}")
     PassengerResponse getPassengerById(@PathVariable long id);
 }

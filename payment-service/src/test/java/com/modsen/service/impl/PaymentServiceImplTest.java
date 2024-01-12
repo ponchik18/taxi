@@ -141,7 +141,7 @@ public class PaymentServiceImplTest {
 
         assertNotNull(actualPaymentListResponse);
         assertThat(expectedPassengers.size())
-                .isEqualTo(actualPaymentListResponse.totalCountOfPayment());
+                .isEqualTo(actualPaymentListResponse.countOfPayment());
         assertThat(expectedPassengers.size())
                 .isEqualTo(actualPaymentListResponse.payments().size());
     }

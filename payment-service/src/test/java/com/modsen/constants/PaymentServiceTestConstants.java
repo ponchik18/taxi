@@ -15,5 +15,8 @@ public interface PaymentServiceTestConstants {
         String EMAIL = "test@test.com";
         Long CARD_ID = 5L;
         Long RIDE_ID = 9L;
+        String EMPTY_STRING = "";
+        Integer DRIVER_SERVICE_PORT = 9999;
+        Integer PASSENGER_SERVICE_PORT = 9998;
     }
 }

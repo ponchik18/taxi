@@ -7,6 +7,6 @@ import java.util.List;
 @Builder
 public record PaymentListResponse(
         List<PaymentResponse> payments,
-        int totalCountOfPayment
+        int countOfPayment
 ) {
 }

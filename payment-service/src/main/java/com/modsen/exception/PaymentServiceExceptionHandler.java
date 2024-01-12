@@ -41,7 +41,7 @@ public class PaymentServiceExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler({NotEnoughMoneyForPayoutException.class, PayoutNotProcessedException.class,  })
+    @ExceptionHandler({NotEnoughMoneyForPayoutException.class, PayoutNotProcessedException.class, DefaultCardDeletionException.class })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessageResponse handleServerErrorException(Exception exception) {
         return ErrorMessageResponse.builder()

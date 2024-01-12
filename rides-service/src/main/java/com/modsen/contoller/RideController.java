@@ -65,7 +65,7 @@ public class RideController {
         return rideService.finishRide(changeRideStatusRequest);
     }
 
-    @PutMapping("/ride")
+    @PutMapping("/cancel")
     @ResponseStatus(HttpStatus.OK)
     public RideResponse cancelRide(@Valid @RequestBody ChangeRideStatusRequest changeRideStatusRequest) {
         return rideService.cancelRide(changeRideStatusRequest);
