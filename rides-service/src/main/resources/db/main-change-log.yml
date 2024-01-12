@@ -6,7 +6,7 @@ databaseChangeLog:
         - tagDatabase:
             tag: db-init
   - include:
-      file: db/versions/v-1.0/table-promo-code-change-log.yml
+      file: db/versions/v-1.0/table-rides-change-log.yml
   - changeSet:
       id: rides-service-create-tables
       author: ponchik18
@@ -16,7 +16,7 @@ databaseChangeLog:
   - include:
       file: db/versions/v-2.0/add-column-is-promo-code-apply-change-log.yml
   - changeSet:
-      id: rides-service-create-tables
+      id: rides-service-add-column-is-promo-code-apply
       author: ponchik18
       changes:
         - tagDatabase:

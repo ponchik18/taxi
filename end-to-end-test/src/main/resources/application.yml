@@ -1,0 +1,20 @@
+server:
+  port: 8010
+spring:
+  application:
+    name: end-to-end-test
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka
+    fetch-registry: true
+    register-with-eureka: true
+feign-client:
+  passenger-service:
+    url: http://localhost:8001
+  driver-service:
+    url: http://localhost:8002
+  rides-service:
+    url: http://localhost:8003
+  rating-service:
+    url: http://localhost:8004

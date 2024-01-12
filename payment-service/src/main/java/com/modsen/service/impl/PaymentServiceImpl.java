@@ -79,7 +79,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private String getDefaultCreditCardForPassenger(Long userId) {
-        validatePassenger(userId);
         StripeCustomer stripeCustomer = stripeCustomerRepository.findByUserIdAndUserRole(userId, UserRole.PASSENGER)
                 .orElseThrow(() -> new StripeCustomerNotFoundException(userId, UserRole.PASSENGER.name()));
 
@@ -94,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<PaymentResponse> paymentResponseList = PaymentMapper.MAPPER_INSTANCE.mapToListOfPaymentResponse(paymentList);
         return PaymentListResponse.builder()
                 .payments(paymentResponseList)
-                .totalCountOfPayment(paymentResponseList.size())
+                .countOfPayment(paymentResponseList.size())
                 .build();
     }
 

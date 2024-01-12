@@ -18,7 +18,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class RidesExceptionHandler {
 
-    @ExceptionHandler({RideNotFoundException.class, EntityNotFoundException.class, NoHandlerFoundException.class})
+    @ExceptionHandler({PromoCodeNotFoundException.class, RideNotFoundException.class, EntityNotFoundException.class, NoHandlerFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorMessageResponse handleNotFoundException(Exception exception) {
 

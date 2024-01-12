@@ -18,11 +18,11 @@
         <module>driver-service</module>
         <module>rides-service</module>
         <module>passenger-service</module>
-        <!--<module>gateway-service</module>-->
         <module>discovery-server</module>
         <module>rating-service</module>
         <module>payment-service</module>
         <module>promo-code-service</module>
+        <module>end-to-end-test</module>
     </modules>
     <properties>
         <java.version>17</java.version>
@@ -37,6 +37,7 @@
         <mockwebserver.version>4.10.0</mockwebserver.version>
         <jackson.datatype.version>2.14.1</jackson.datatype.version>
         <mockito.core.version>3.4.6</mockito.core.version>
+        <wiremock.version>2.25.1</wiremock.version>
     </properties>
     <dependencies>
         <dependency>

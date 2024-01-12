@@ -93,6 +93,7 @@ public class CreditCardServiceImpl implements CreditCardService {
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
+        creditCardRepository.delete(creditCard);
     }
 
     @Override

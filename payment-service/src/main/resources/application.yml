@@ -27,3 +27,6 @@ eureka:
 
 stripe:
   apiKey: ${STRIPE_API_KEY}
+feign-client:
+  driver-service: http://driver-service
+  passenger-service: http://passenger-service

@@ -14,3 +14,24 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+  kafka:
+    consumer:
+      topic: test-change-driver-status
+      bootstrap-servers: localhost:9092
+      group-id: change-driver-status-listener
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "com.modsen.dto.driver"
+    admin:
+      auto-create: true
+  integration:
+    kafka:
+      bootstrap-servers: localhost:9092
+      sent-topic: test-save-ride
+      accepted-topic: test-create-ride
+      group_id: drive-service

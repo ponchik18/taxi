@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = PaymentServiceConstants.BasePath.DRIVER_SERVICE_NAME,
+        url = "${feign-client.driver-service}",
         configuration = FeignClientConfiguration.class,
         path = PaymentServiceConstants.BasePath.DRIVER_SERVICE_PATH)
 public interface DriverServiceClient {

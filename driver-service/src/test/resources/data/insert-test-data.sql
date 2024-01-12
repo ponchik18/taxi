@@ -1,0 +1,7 @@
+INSERT INTO driver (id, license_number, first_name, last_name, email, phone, driver_status) VALUES (5, 'lic_123', 'John', 'Doe', 'john.doe@example.com', '+375111111119', 'AVAILABLE') ON CONFLICT (id) DO NOTHING;;
+INSERT INTO driver (id, license_number, first_name, last_name, email, phone, driver_status) VALUES (6, 'lic_124', 'Jane', 'Doe', 'jane.doe@example.com', '+375111111112', 'BUSY') ON CONFLICT (id) DO NOTHING;;
+INSERT INTO driver (id, license_number, first_name, last_name, email, phone, driver_status) VALUES (7, 'lic_125', 'Alice', 'Smith', 'alice.smith@example.com', '+375111111113', 'OFFLINE') ON CONFLICT (id) DO NOTHING;;
+INSERT INTO driver (id, license_number, first_name, last_name, email, phone, driver_status) VALUES (8, 'lic_126', 'Bob', 'Johnson', 'bob.johnson@example.com', '+375111111114', 'AVAILABLE') ON CONFLICT (id) DO NOTHING;;
+INSERT INTO driver (id, license_number, first_name, last_name, email, phone, driver_status) VALUES (9, 'lic_127', 'Eva', 'Williams', 'eva.williams@example.com', '+375111111115', 'BUSY') ON CONFLICT (id) DO NOTHING;;
+INSERT INTO driver (id, license_number, first_name, last_name, email, phone, driver_status) VALUES (10, 'lic_128', 'Charlie', 'Brown', 'charlie.brown@example.com', '+375111111116', 'OFFLINE') ON CONFLICT (id) DO NOTHING;;
+INSERT INTO driver (id, license_number, first_name, last_name, email, phone, driver_status) VALUES (11, 'lic_129', 'Grace', 'Miller', 'grace.miller@example.com', '+375111111117', 'AVAILABLE') ON CONFLICT (id) DO NOTHING;;
