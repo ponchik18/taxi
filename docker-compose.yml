@@ -10,6 +10,7 @@ services:
       POSTGRES_USER: ponchik18
       POSTGRES_PASSWORD: password
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - local_pgdata:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
@@ -28,14 +29,14 @@ services:
     container_name: zookeeper
     hostname: zookeeper
     ports:
-      - 2181:2181
+      - "2181:2181"
     environment:
       ZOO_MY_ID: 1
   kafka:
     image: wurstmeister/kafka
     container_name: kafka
     ports:
-      - 9092:9092
+      - "9092:9092"
     links:
       - zookeeper:zookeeper
     environment:
@@ -45,20 +46,18 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CREATE_TOPICS: "create-ride:1:1,save-ride:1:1,cancel-ride:1:1,create-rating:1:1,change-driver-status:1:1"
-
-  kafka_manager:
-    image: hlebalbau/kafka-manager:stable
-    container_name: kakfa-manager
+  passenger-service:
+    build: ./passenger-service
+    image: passenger-service
     restart: always
     ports:
-      - "9000:9000"
-    depends_on:
-      - zookeeper
-      - kafka
+      - "8001:8001"
     environment:
-      ZK_HOSTS: "zookeeper:2181"
-      APPLICATION_SECRET: "random-secret"
-      command: -Dpidfile.path=/dev/null
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/passenger
+    expose:
+      - "8001"
+    depends_on:
+      - db
 volumes:
   local_pgdata:
   pgadmin-data:
