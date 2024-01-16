@@ -9,6 +9,8 @@
     </parent>
 
     <artifactId>promo-code-service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <properties>
         <java.version>17</java.version>
         <kotlin.version>1.9.20</kotlin.version>

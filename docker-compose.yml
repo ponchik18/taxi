@@ -3,18 +3,19 @@ services:
   db:
     image: postgres
     container_name: local_pgdb
-    restart: always
+    restart: on-failure
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: ponchik18
       POSTGRES_PASSWORD: password
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - local_pgdata:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
-    restart: always
+    restart: on-failure
     ports:
       - "8888:80"
     environment:
@@ -24,41 +25,130 @@ services:
       - pgadmin-data:/var/lib/pgadmin
   zookeeper:
     image: zookeeper
-    restart: always
+    restart: on-failure
     container_name: zookeeper
     hostname: zookeeper
     ports:
-      - 2181:2181
+      - "2181:2181"
     environment:
       ZOO_MY_ID: 1
   kafka:
     image: wurstmeister/kafka
     container_name: kafka
+    restart: on-failure
     ports:
-      - 9092:9092
+      - "9092:9092"
     links:
       - zookeeper:zookeeper
+    hostname: kafka
     environment:
-      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_HOST_NAME: localhost
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CREATE_TOPICS: "create-ride:1:1,save-ride:1:1,cancel-ride:1:1,create-rating:1:1,change-driver-status:1:1"
-
-  kafka_manager:
-    image: hlebalbau/kafka-manager:stable
-    container_name: kakfa-manager
-    restart: always
+  discovery-server:
+    build: ./discovery-server
+    image: discovery-server
+    restart: on-failure
     ports:
-      - "9000:9000"
+      - "8000:8000"
+    expose:
+      - "8000"
+  passenger-service:
+    build: ./passenger-service
+    image: passenger-service
+    restart: on-failure
+    ports:
+      - "8001:8001"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/passenger
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+    expose:
+      - "8001"
     depends_on:
+      - db
+      - discovery-server
+  driver-service:
+    build: ./driver-service
+    image: driver-service
+    restart: on-failure
+    ports:
+      - "8002:8002"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/driver
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    expose:
+      - "8002"
+    depends_on:
+      - db
       - zookeeper
       - kafka
+      - discovery-server
+  rides-service:
+    build: ./rides-service
+    image: rides-service
+    restart: on-failure
+    ports:
+      - "8003:8003"
     environment:
-      ZK_HOSTS: "zookeeper:2181"
-      APPLICATION_SECRET: "random-secret"
-      command: -Dpidfile.path=/dev/null
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/rides
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    expose:
+      - "8003"
+    depends_on:
+      - db
+      - zookeeper
+      - kafka
+      - discovery-server
+  rating-service:
+    build: ./rating-service
+    image: rating-service
+    restart: on-failure
+    ports:
+      - "8004:8004"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/rating
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+    expose:
+      - "8004"
+    depends_on:
+      - db
+      - zookeeper
+      - kafka
+      - discovery-server
+  promo-code-service:
+    build: ./promo-code-service
+    image: promo-code-service
+    restart: on-failure
+    ports:
+      - "8006:8006"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/promo_code
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+    expose:
+      - "8006"
+    depends_on:
+      - db
+      - zookeeper
+      - kafka
+      - discovery-server
+  payment-service:
+    build: ./payment-service
+    image: payment-service
+    restart: on-failure
+    ports:
+      - "8005:8005"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/payment
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+    env_file:
+      - .env
+    expose:
+      - "8005"
+    depends_on:
+      - db
+      - discovery-server
 volumes:
   local_pgdata:
   pgadmin-data:

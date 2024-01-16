@@ -3,6 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 payment-service/src/main/resources/stripe.yml
+.env
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

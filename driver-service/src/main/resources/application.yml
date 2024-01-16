@@ -21,7 +21,7 @@ spring:
   kafka:
     consumer:
       topic: change-driver-status
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
       group-id: change-driver-status-listener
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -33,7 +33,7 @@ spring:
               packages: "com.modsen.dto.driver"
   integration:
     kafka:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
       sent-topic: save-ride
       accepted-topic: create-ride
       group_id: drive-service
