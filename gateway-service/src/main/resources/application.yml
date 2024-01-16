@@ -4,3 +4,44 @@ server:
 spring:
   application:
     name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: passengerService
+          uri: lb://PASSENGER-SERVICE
+          predicates:
+            - Path=/api/v1/passenger/**
+
+        - id: driverService
+          uri: lb://DRIVER-SERVICE
+          predicates:
+            - Path=/api/v1/driver/**
+
+        - id: ridesService
+          uri: lb://RIDES-SERVICE
+          predicates:
+            - Path=/api/v1/rides/**
+
+        - id: paymentService
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/v1/payment/**
+
+        - id: promoCodeService
+          uri: lb://PROMO-CODE-SERVICE
+          predicates:
+            - Path=/api/v1/promo-code/**
+
+        - id: ratingService
+          uri: lb://RATING-SERVICE
+          predicates:
+            - Path=/api/v1/RATING/**
+  main:
+    web-application-type:
+      reactive
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka
+    fetch-registry: true
+    register-with-eureka: true
