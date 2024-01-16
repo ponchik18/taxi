@@ -53,6 +53,18 @@ services:
       - "8000:8000"
     expose:
       - "8000"
+  gateway-service:
+    build: ./gateway-service
+    image: gateway-service
+    restart: on-failure
+    ports:
+      - "8001:8001"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+    expose:
+      - "8001"
+    depends_on:
+      - discovery-server
   passenger-service:
     build: ./passenger-service
     image: passenger-service
