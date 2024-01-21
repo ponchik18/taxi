@@ -45,3 +45,17 @@ eureka:
       defaultZone: http://localhost:8000/eureka
     fetch-registry: true
     register-with-eureka: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

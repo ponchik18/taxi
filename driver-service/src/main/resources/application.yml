@@ -57,7 +57,21 @@ resilience4j.circuit-breaker:
       slowCallRateThreshold: 50
       slowCallDurationThreshold: 10
       failureRateThreshold: 50
+
 management:
   health:
     circuit-breakers:
       enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

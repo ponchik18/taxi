@@ -30,3 +30,18 @@ stripe:
 feign-client:
   driver-service: http://driver-service
   passenger-service: http://passenger-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

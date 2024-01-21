@@ -58,11 +58,11 @@ services:
     image: gateway-service
     restart: on-failure
     ports:
-      - "8001:8001"
+      - "8080:8080"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
     expose:
-      - "8001"
+      - "8080"
     depends_on:
       - discovery-server
   passenger-service:
@@ -161,6 +161,35 @@ services:
     depends_on:
       - db
       - discovery-server
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - passenger-service
+      - payment-service
+      - driver-service
+      - gateway-service
+      - discovery-server
+      - promo-code-service
+      - rating-service
+      - rides-service
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+
 volumes:
   local_pgdata:
   pgadmin-data:

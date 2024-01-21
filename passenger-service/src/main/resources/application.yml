@@ -36,3 +36,17 @@ spring:
               packages: "com.modsen.dto.rating, com.modsen.dto.card, com.modsen.dto.promo,com.modsen.dto.rides"
     admin:
       auto-create: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

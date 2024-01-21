@@ -42,3 +42,4 @@ build/
 /zoo/
 /broker/
 /kafka-streams-future/
+/grafana/
