@@ -19,6 +19,7 @@ import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.messaging.PollableChannel;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,6 +83,7 @@ public class ConsumerChannelConfig {
                 DriverServiceConstants.KafkaProperties.TRUSTED_PACKAGE_KEY,
                 DriverServiceConstants.KafkaProperties.TRUSTED_PACKAGE_VALUE
         );
+
         return properties;
     }
 }

@@ -26,11 +26,11 @@ public class LoggingAdvice {
 
         log.info("method invoke {}: {}() arguments :{}", className, methodName, mapper.writeValueAsString(arrayOfArgument));
         Object object = joinPoint.proceed();
-        log.info("{}: {}() Response", className, methodName);
+        log.info("{}: {}()", className, methodName);
         return object;
     }
 
-    @Pointcut(value = "execution(* com.modsen.*.*.*(..) )")
+    @Pointcut(value = "execution(* com.modsen.*.*.*(..)) && !within(com.modsen.service.impl.StripeServiceImpl) && !execution(* com.modsen.config.*.*.*(..)) ")
     public void myPointcut() {
     }
 

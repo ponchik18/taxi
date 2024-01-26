@@ -73,7 +73,6 @@ public class ConsumerChannelConfig {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, springIntegrationKafkaGroupId);
-
         properties.put(
                 ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
                 RidesServiceConstants.KafkaProperties.AUTO_OFFSET_RESET_CONFIG_VALUE

@@ -30,7 +30,7 @@ public class LoggingAdvice {
         return object;
     }
 
-    @Pointcut(value = "execution(* com.modsen.*.*.*(..) )")
+    @Pointcut(value = "execution(* com.modsen.service.*.*(..)) && execution(* com.modsen.controller.*.*(..))")
     public void myPointcut() {
     }
 
