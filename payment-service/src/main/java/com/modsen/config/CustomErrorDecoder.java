@@ -22,9 +22,9 @@ public class CustomErrorDecoder implements ErrorDecoder {
         }
         HttpStatus responseStatus = HttpStatus.valueOf(response.status());
         if (responseStatus.is4xxClientError()) {
-            return new EntityNotFoundException(message.message());
+            return new EntityNotFoundException(message.getMessage());
         } else {
-            return new Exception(message.message());
+            return new Exception(message.getMessage());
         }
 
     }

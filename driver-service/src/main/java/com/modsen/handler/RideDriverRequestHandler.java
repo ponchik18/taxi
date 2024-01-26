@@ -5,6 +5,8 @@ import com.modsen.dto.rides.RideResponseWithDriver;
 import com.modsen.enums.DriverStatus;
 import com.modsen.model.Driver;
 import com.modsen.repository.DriverRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -19,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class RideDriverRequestHandler implements MessageHandler {
+    private static final Logger log = LoggerFactory.getLogger(RideDriverRequestHandler.class);
     private DriverRepository driverRepository;
     private MessageChannel producingChannel;
     @Value("${spring.integration.kafka.sent-topic}")
@@ -36,6 +39,7 @@ public class RideDriverRequestHandler implements MessageHandler {
 
     @Override
     public void handleMessage(@NonNull Message<?> message) throws MessagingException {
+        log.info("Received Message in class RideDriverRequestHandler: " + message);
         RideDriverRequest rideDriverRequest = (RideDriverRequest) message.getPayload();
 
         List<Driver> drivers = driverRepository.findAllByDriverStatus(DriverStatus.AVAILABLE);
@@ -52,6 +56,7 @@ public class RideDriverRequestHandler implements MessageHandler {
                     rideResponseWithDriver,
                     Collections.singletonMap(KafkaHeaders.TOPIC, springIntegrationKafkaSentTopic))
             );
+            log.info("Message in class RideDriverRequestHandler was be sent back");
         }
     }
 }

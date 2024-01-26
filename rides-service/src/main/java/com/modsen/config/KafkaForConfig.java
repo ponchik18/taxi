@@ -38,6 +38,7 @@ public class KafkaForConfig {
                 RidesServiceConstants.KafkaProperties.TRUSTED_PACKAGE_KEY,
                 RidesServiceConstants.KafkaProperties.TRUSTED_PACKAGE_VALUE
         );
+
         return props;
     }
 }
