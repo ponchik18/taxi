@@ -4,6 +4,7 @@ import com.modsen.constants.RidesServiceConstants;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -61,6 +62,16 @@ public class RidesExceptionHandler {
     public ErrorMessageResponse handle(Exception exception) {
         return ErrorMessageResponse.builder()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .timestamp(new Date())
+                .message(exception.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessageResponse handleAccessDeniedException(Exception exception) {
+        return ErrorMessageResponse.builder()
+                .statusCode(HttpStatus.FORBIDDEN.value())
                 .timestamp(new Date())
                 .message(exception.getMessage())
                 .build();

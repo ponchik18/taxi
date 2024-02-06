@@ -10,6 +10,7 @@ import com.modsen.service.DriverService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,36 +30,42 @@ public class DriverController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public DriverListResponse getAllDriver(PageSetting pageSetting) {
         return driverService.getAllDrivers(pageSetting);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('DRIVER')")
     public DriverResponse createDriver(@Valid @RequestBody DriverRequest driverRequest) {
         return driverService.createDriver(driverRequest);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('DRIVER')")
     public DriverResponse getDriverById(@PathVariable long id) {
         return driverService.getDriverById(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('DRIVER')")
     public DriverResponse updateDriver(@PathVariable long id, @Valid @RequestBody DriverRequest driverRequest) {
         return driverService.updateDriver(id, driverRequest);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteDriver(@PathVariable long id) {
         driverService.deleteDriver(id);
     }
 
     @PatchMapping("/status")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('DRIVER')")
     public DriverResponse changeStatus(@RequestBody DriverStatusChangeRequest driverStatusChangeRequest) {
         return driverService.changeStatus(driverStatusChangeRequest);
     }

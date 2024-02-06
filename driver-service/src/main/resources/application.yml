@@ -3,6 +3,12 @@ server:
 spring:
   application:
     name: driver-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/auth/realms/api-taxi-realm
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
   datasource:
     password: password
     url: jdbc:postgresql://localhost:5432/driver
@@ -21,7 +27,8 @@ spring:
   kafka:
     consumer:
       topic: change-driver-status
-      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      #bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      bootstrap-servers: localhost:29092
       group-id: change-driver-status-listener
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -33,7 +40,8 @@ spring:
               packages: "com.modsen.dto.driver"
   integration:
     kafka:
-      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      #bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      bootstrap-servers: localhost:29092
       sent-topic: save-ride
       accepted-topic: create-ride
       group_id: drive-service
@@ -81,3 +89,10 @@ management:
 logging:
   pattern:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+jwt:
+  auth:
+    converter:
+      principal-attribute:
+        preferred_username
+      resource-id:
+        taxi-api-auth
