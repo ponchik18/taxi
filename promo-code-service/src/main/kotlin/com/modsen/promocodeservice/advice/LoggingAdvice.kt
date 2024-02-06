@@ -27,7 +27,7 @@ class LoggingAdvice(private val mapper: ObjectMapper) {
         return result
     }
 
-    @Pointcut("execution(* com.modsen.promocodeservice.*.*.*(..))")
+    @Pointcut("execution(* com.modsen.promocodeservice.*.*.*(..)) && !within(com.modsen.promocodeservice.config..*)")
     fun myPointcut() {
     }
 }

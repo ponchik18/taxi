@@ -2,11 +2,11 @@ package com.modsen.promocodeservice.exception
 
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.NoHandlerFoundException
-import java.lang.Exception
 import java.util.*
 
 @RestControllerAdvice
@@ -30,8 +30,16 @@ class PromoCodeExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    fun handleServerErrorException(exception: Exception)= ErrorMessageResponse(
+    fun handleServerErrorException(exception: Exception) = ErrorMessageResponse(
         statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value(),
+        timestamp = Date(),
+        message = exception.message!!
+    )
+
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleAccessDeniedException(exception: Exception) = ErrorMessageResponse(
+        statusCode = HttpStatus.FORBIDDEN.value(),
         timestamp = Date(),
         message = exception.message!!
     )

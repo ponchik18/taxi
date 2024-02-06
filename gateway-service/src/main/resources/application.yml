@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8111
 
 spring:
   application:
@@ -36,9 +36,28 @@ spring:
           uri: lb://RATING-SERVICE
           predicates:
             - Path=/api/v1/RATING/**
+      default-filters:
+        - TokenRelay=
+        - RemoveRequestHeader=Cookie
   main:
     web-application-type:
       reactive
+    allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      client:
+        registration:
+          gateway:
+            provider: keycloak
+            client-id: taxi-api-auth
+            client-secret: 4IbCDaCRarqADALrDu3QH07u9kgh8NmX
+            authorization-grant-type: authorization_code
+#            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/auth/realms/api-taxi-realm
 eureka:
   client:
     serviceUrl:

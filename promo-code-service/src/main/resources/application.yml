@@ -3,6 +3,12 @@ server:
 spring:
   application:
     name: promo-code-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8180/auth/realms/api-taxi-realm
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
   datasource:
     password: password
     url: jdbc:postgresql://localhost:5432/promo_code
@@ -43,3 +49,10 @@ management:
 logging:
   pattern:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+jwt:
+  auth:
+    converter:
+      principal-attribute:
+        preferred_username
+      resource-id:
+        taxi-api-auth

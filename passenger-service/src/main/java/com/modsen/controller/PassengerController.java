@@ -9,6 +9,7 @@ import com.modsen.service.PassengerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,30 +28,35 @@ public class PassengerController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public PassengerListResponse getAllPassenger(PageSetting pageSetting) {
         return passengerService.getAllPassenger(pageSetting);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('PASSENGER')")
     public PassengerResponse createPassenger(@Valid @RequestBody PassengerRequest passengerRequest) {
         return passengerService.createPassenger(passengerRequest);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('PASSENGER')")
     public PassengerResponse getPassengerById(@PathVariable long id) {
         return passengerService.getPassengerById(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('PASSENGER')")
     public PassengerResponse updatePassenger(@PathVariable long id, @Valid @RequestBody PassengerRequest passengerRequest) {
         return passengerService.updatePassenger(id, passengerRequest);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deletePassenger(@PathVariable long id) {
         passengerService.deletePassenger(id);
     }

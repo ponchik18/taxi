@@ -3,6 +3,12 @@ server:
 spring:
   application:
     name: rides-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8180/auth/realms/api-taxi-realm
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
   datasource:
     password: password
     url: jdbc:postgresql://localhost:5432/rides
@@ -20,13 +26,13 @@ spring:
     change-log: classpath:db/main-change-log.yml
   integration:
     kafka:
-      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      bootstrap-servers: localhost:29092
       sent-topic: create-ride
       accepted-topic: save-ride
       group_id: rides-service
   kafka:
     consumer:
-      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      bootstrap-servers: localhost:29092
     producer:
       change-driver-status-topic: change-driver-status
 

@@ -30,7 +30,7 @@ public class LoggingAdvice {
         return object;
     }
 
-    @Pointcut(value = "execution(* com.modsen.*.*.*(..)) && !within(com.modsen.service.impl.StripeServiceImpl) && !execution(* com.modsen.config.*.*.*(..)) ")
+    @Pointcut(value = "execution(* com.modsen.*.*.*(..)) && !within(com.modsen.service.impl.StripeServiceImpl) && !within(com.modsen.config..*)")
     public void myPointcut() {
     }
 

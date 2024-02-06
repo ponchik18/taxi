@@ -12,6 +12,7 @@ import com.modsen.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,24 +29,28 @@ public class PaymentController {
 
     @GetMapping("/history")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public PaymentListResponse getPaymentHistory(PageSetting pageSetting) {
         return paymentService.getPaymentHistory(pageSetting);
     }
 
     @PostMapping("/charge")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('PASSENGER') || hasRole('DRIVER')")
     public PaymentResponse charge(@Valid  @RequestBody PaymentRequest paymentRequest) {
         return paymentService.charge(paymentRequest);
     }
 
     @PostMapping("/payout")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @PreAuthorize("hasRole('DRIVER')")
     public PayoutResponse payout(@Valid @RequestBody PayoutRequest payoutRequest) {
         return paymentService.payout(payoutRequest);
     }
 
     @GetMapping("/balance")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('DRIVER')")
     public DriverBalanceResponse getDriverBalance(@RequestParam long driverId) {
         return paymentService.getDriverBalance(driverId);
     }

@@ -3,6 +3,7 @@ package com.modsen.exception;
 import com.modsen.constants.PaymentServiceConstants;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -65,6 +66,16 @@ public class PaymentServiceExceptionHandler {
                 .timestamp(new Date())
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .message(PaymentServiceConstants.Errors.Message.NOT_VALID_FIELD)
+                .build();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessageResponse handleAccessDeniedException(Exception exception) {
+        return ErrorMessageResponse.builder()
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .timestamp(new Date())
+                .message(exception.getMessage())
                 .build();
     }
 }

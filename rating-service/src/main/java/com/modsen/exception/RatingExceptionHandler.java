@@ -2,6 +2,7 @@ package com.modsen.exception;
 
 import com.modsen.constants.RatingServiceConstants;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -59,6 +60,16 @@ public class RatingExceptionHandler {
     public ErrorMessageResponse handleDuplicateKeyException(RatingNotFoundException exception) {
         return ErrorMessageResponse.builder()
                 .statusCode(HttpStatus.CONFLICT.value())
+                .timestamp(new Date())
+                .message(exception.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessageResponse handleAccessDeniedException(Exception exception) {
+        return ErrorMessageResponse.builder()
+                .statusCode(HttpStatus.FORBIDDEN.value())
                 .timestamp(new Date())
                 .message(exception.getMessage())
                 .build();
