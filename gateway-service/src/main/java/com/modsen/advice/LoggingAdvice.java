@@ -18,20 +18,20 @@ public class LoggingAdvice {
 
     private final ObjectMapper mapper;
 
-    @Around("myPointcut()")
-    public Object applicationLogger(ProceedingJoinPoint joinPoint) throws Throwable {
-        String methodName = joinPoint.getSignature().getName();
-        String className = joinPoint.getTarget().getClass().toString();
-        Object[] arrayOfArgument = joinPoint.getArgs();
+//    @Around("myPointcut()")
+//    public Object applicationLogger(ProceedingJoinPoint joinPoint) throws Throwable {
+//        String methodName = joinPoint.getSignature().getName();
+//        String className = joinPoint.getTarget().getClass().toString();
+//        Object[] arrayOfArgument = joinPoint.getArgs();
+//
+//        log.info("method invoke {}: {}() arguments :{}", className, methodName, mapper.writeValueAsString(arrayOfArgument));
+//        Object object = joinPoint.proceed();
+//        log.info("{}: {}()", className, methodName);
+//        return object;
+//    }
 
-        log.info("method invoke {}: {}() arguments :{}", className, methodName, mapper.writeValueAsString(arrayOfArgument));
-        Object object = joinPoint.proceed();
-        log.info("{}: {}()", className, methodName);
-        return object;
-    }
-
-    @Pointcut(value = "execution(* com.modsen.*.*.*(..)) && !within(com.modsen.config..*) && !within(org.springframework..*)")
-    public void myPointcut() {
-    }
+//    @Pointcut(value = "execution(* com.modsen.*.*.*(..)) && !within(com.modsen.config..*) && !within(org.springframework..*)")
+//    public void myPointcut() {
+//    }
 
 }

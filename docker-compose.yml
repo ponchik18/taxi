@@ -14,19 +14,19 @@ services:
       - local_pgdata:/var/lib/postgresql/data
     networks:
       - taxi-network
-#  pgadmin:
-#    image: dpage/pgadmin4
-#    container_name: pgadmin4_container
-#    restart: on-failure
-#    ports:
-#      - "8888:80"
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
-#      PGADMIN_DEFAULT_PASSWORD: password
-#    volumes:
-#      - pgadmin-data:/var/lib/pgadmin
-#    networks:
-#      - taxi-network
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: on-failure
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - taxi-network
   zookeeper:
     image: zookeeper
     restart: on-failure
@@ -55,205 +55,209 @@ services:
       KAFKA_CREATE_TOPICS: "create-ride:1:1,save-ride:1:1,cancel-ride:1:1,create-rating:1:1,change-driver-status:1:1"
     networks:
       - taxi-network
-#  discovery-server:
-#    build: ./discovery-server
-#    image: discovery-server
-#    restart: on-failure
-#    ports:
-#      - "8000:8000"
-#    expose:
-#      - "8000"
-#    networks:
-#      - taxi-network
+  discovery-server:
+    build: ./discovery-server
+    image: discovery-server
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    networks:
+      - taxi-network
   gateway-service:
     build: ./gateway-service
     image: gateway-service
     restart: on-failure
+    links:
+      - polar-redis
     ports:
       - "8111:8111"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
       - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
       - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
+      - SPRING_DATA_REDIS_HOST=polar-redis
+      - SPRING_DATA_REDIS_PORT=6379
     expose:
       - "8111:8111"
     depends_on:
-#      - discovery-server
-#      - zipkin
+      - discovery-server
+      - zipkin
       - keycloak
     networks:
       - taxi-network
-#  passenger-service:
-#    build: ./passenger-service
-#    image: passenger-service
-#    restart: on-failure
-#    ports:
-#      - "8001:8001"
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/passenger
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
-#      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-#      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
-#    expose:
-#      - "8001"
-#    depends_on:
-#      - db
-#      - zipkin
-#      - discovery-server
-#      - keycloak
-#    networks:
-#      - taxi-network
-#  driver-service:
-#    build: ./driver-service
-#    image: driver-service
-#    restart: on-failure
-#    ports:
-#      - "8002:8002"
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/driver
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
-#      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-#      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-#      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
-#    networks:
-#      - taxi-network
-#    expose:
-#      - "8002"
-#    depends_on:
-#      - db
-#      - zookeeper
-#      - kafka
-#      - zipkin
-#      - discovery-server
-#      - keycloak
-#  rides-service:
-#    build: ./rides-service
-#    image: rides-service
-#    restart: on-failure
-#    ports:
-#      - "8003:8003"
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/rides
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
-#      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-#      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-#      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
-#    expose:
-#      - "8003"
-#    depends_on:
-#      - db
-#      - zookeeper
-#      - kafka
-#      - discovery-server
-#      - keycloak
-#    networks:
-#      - taxi-network
-#  rating-service:
-#    build: ./rating-service
-#    image: rating-service
-#    restart: on-failure
-#    ports:
-#      - "8004:8004"
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/rating
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
-#      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-#      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
-#    expose:
-#      - "8004"
-#    depends_on:
-#      - db
-#      - zookeeper
-#      - kafka
-#      - zipkin
-#      - discovery-server
-#      - keycloak
-#    networks:
-#      - taxi-network
-#  promo-code-service:
-#    build: ./promo-code-service
-#    image: promo-code-service
-#    restart: on-failure
-#    ports:
-#      - "8006:8006"
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/promo_code
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
-#      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-#      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
-#    expose:
-#      - "8006"
-#    depends_on:
-#      - db
-#      - zookeeper
-#      - zipkin
-#      - kafka
-#      - discovery-server
-#      - keycloak
-#    networks:
-#      - taxi-network
-#  payment-service:
-#    build: ./payment-service
-#    image: payment-service
-#    restart: on-failure
-#    ports:
-#      - "8005:8005"
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/payment
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
-#      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-#      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
-#    env_file:
-#      - .env
-#    expose:
-#      - "8005"
-#    depends_on:
-#      - db
-#      - zipkin
-#      - discovery-server
-#      - keycloak
-#    networks:
-#      - taxi-network
-#  prometheus:
-#    image: prom/prometheus
-#    container_name: prometheus
-#    restart: unless-stopped
-#    ports:
-#      - "9090:9090"
-#    volumes:
-#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-#    depends_on:
-#      - passenger-service
-#      - payment-service
-#      - driver-service
-#      - gateway-service
-#      - discovery-server
-#      - promo-code-service
-#      - rating-service
-#      - rides-service
-#    networks:
-#      - taxi-network
-#  grafana:
-#    image: grafana/grafana-oss
-#    container_name: grafana
-#    restart: unless-stopped
-#    ports:
-#      - "3000:3000"
-#    volumes:
-#      - ./grafana:/var/lib/grafana
-#    environment:
-#      - GF_SECURITY_ADMIN_USER=admin
-#      - GF_SECURITY_ADMIN_PASSWORD=password
-#    networks:
-#      - taxi-network
-#  zipkin:
-#    image: openzipkin/zipkin
-#    container_name: zipkin
-#    restart: unless-stopped
-#    ports:
-#      - "9411:9411"
-#    networks:
-#      - taxi-network
+  passenger-service:
+    build: ./passenger-service
+    image: passenger-service
+    restart: on-failure
+    ports:
+      - "8001:8001"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/passenger
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
+    expose:
+      - "8001"
+    depends_on:
+      - db
+      - zipkin
+      - discovery-server
+      - keycloak
+    networks:
+      - taxi-network
+  driver-service:
+    build: ./driver-service
+    image: driver-service
+    restart: on-failure
+    ports:
+      - "8002:8002"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/driver
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
+    networks:
+      - taxi-network
+    expose:
+      - "8002"
+    depends_on:
+      - db
+      - zookeeper
+      - kafka
+      - zipkin
+      - discovery-server
+      - keycloak
+  rides-service:
+    build: ./rides-service
+    image: rides-service
+    restart: on-failure
+    ports:
+      - "8003:8003"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/rides
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
+    expose:
+      - "8003"
+    depends_on:
+      - db
+      - zookeeper
+      - kafka
+      - discovery-server
+      - keycloak
+    networks:
+      - taxi-network
+  rating-service:
+    build: ./rating-service
+    image: rating-service
+    restart: on-failure
+    ports:
+      - "8004:8004"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/rating
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
+    expose:
+      - "8004"
+    depends_on:
+      - db
+      - zookeeper
+      - kafka
+      - zipkin
+      - discovery-server
+      - keycloak
+    networks:
+      - taxi-network
+  promo-code-service:
+    build: ./promo-code-service
+    image: promo-code-service
+    restart: on-failure
+    ports:
+      - "8006:8006"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/promo_code
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
+    expose:
+      - "8006"
+    depends_on:
+      - db
+      - zookeeper
+      - zipkin
+      - kafka
+      - discovery-server
+      - keycloak
+    networks:
+      - taxi-network
+  payment-service:
+    build: ./payment-service
+    image: payment-service
+    restart: on-failure
+    ports:
+      - "8005:8005"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://local_pgdb:5432/payment
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8000/eureka/
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/auth/realms/api-taxi-realm
+    env_file:
+      - .env
+    expose:
+      - "8005"
+    depends_on:
+      - db
+      - zipkin
+      - discovery-server
+      - keycloak
+    networks:
+      - taxi-network
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - passenger-service
+      - payment-service
+      - driver-service
+      - gateway-service
+      - discovery-server
+      - promo-code-service
+      - rating-service
+      - rides-service
+    networks:
+      - taxi-network
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    networks:
+      - taxi-network
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    networks:
+      - taxi-network
   polar-redis:
     image: redis
     container_name: polar-redis
