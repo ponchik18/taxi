@@ -246,19 +246,21 @@ services:
 #      - GF_SECURITY_ADMIN_PASSWORD=password
 #    networks:
 #      - taxi-network
-  zipkin:
-    image: openzipkin/zipkin
-    container_name: zipkin
-    restart: unless-stopped
-    ports:
-      - "9411:9411"
-    networks:
-      - taxi-network
+#  zipkin:
+#    image: openzipkin/zipkin
+#    container_name: zipkin
+#    restart: unless-stopped
+#    ports:
+#      - "9411:9411"
+#    networks:
+#      - taxi-network
   polar-redis:
     image: redis
     container_name: polar-redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - taxi-network
   keycloak:
@@ -293,3 +295,4 @@ networks:
 volumes:
   local_pgdata:
   pgadmin-data:
+  redis_data:
